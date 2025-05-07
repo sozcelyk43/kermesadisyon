@@ -1,0 +1,16 @@
+{
+  // ... diğer alanlar ...
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js", // Render bu komutu kullanacak
+    "build": "echo 'Build step not needed or handled by Render'" // Opsiyonel build scripti
+  },
+  "dependencies": {
+    "express": "^4.17.1", // Sürümler farklı olabilir
+    "ws": "^8.0.0"      // Sürümler farklı olabilir
+  },
+  "engines": { // Render'a hangi Node sürümünü kullanacağını söylemek için ekleyebilirsiniz
+    "node": "18.x" // veya kullandığınız uyumlu sürüm
+   }
+  // ... pkg bölümü artık gerekli değil ...
+}
