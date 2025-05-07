@@ -1,16 +1,26 @@
 {
-  // ... diğer alanlar ...
+  "name": "emet-adisyon-server",
+  "version": "1.0.0",
+  "description": "Emet Lezzet Günleri Adisyon Sunucusu",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js", // Render bu komutu kullanacak
-    "build": "echo 'Build step not needed or handled by Render'" // Opsiyonel build scripti
+    "start": "node server.js",
+    "build": "pkg server.js --targets node18-win-x64 --assets ./public/**/* -o EmetAdisyonSunucu"
   },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
   "dependencies": {
-    "express": "^4.17.1", // Sürümler farklı olabilir
-    "ws": "^8.0.0"      // Sürümler farklı olabilir
+    "express": "^4.17.1",
+    "ws": "^8.0.0"
   },
-  "engines": { // Render'a hangi Node sürümünü kullanacağını söylemek için ekleyebilirsiniz
-    "node": "18.x" // veya kullandığınız uyumlu sürüm
-   }
-  // ... pkg bölümü artık gerekli değil ...
+  "pkg": {
+    "assets": [
+      "./public/**/*"
+    ],
+    "scripts": []
+  },
+  "engines": {
+    "node": "18.x"
+  }
 }
