@@ -649,7 +649,7 @@
             case 'tables_update':
                 // Sadece giriş yapılmışsa veya localStorage'dan yüklenmişse tabloları işle
                 if(appState.user){ 
-                    console.log("Tables update alindi, isleniyor...");
+                    console.log("[tables_update] Mesaj alındı. appState.user:", appState.user); // DEBUG
                     appState.tables = message.payload.tables;
                     renderTables(); // Masaları render et
                     renderInitialDataIfNeeded(); // Diğer başlangıç renderları (product grid vb.)
@@ -664,7 +664,7 @@
                         }
                     }
                 } else {
-                    console.log("Kullanıcı girişi/oturumu bekleniyor, tables_update şimdilik işlenmedi.");
+                    console.log("[tables_update] Kullanıcı girişi/oturumu bekleniyor, tables_update şimdilik işlenmedi.");
                 }
                 break;
             case 'sales_report_data':
@@ -719,11 +719,13 @@
 
     // --- Render Fonksiyonları ---
     function renderInitialData() {
-        // Bu fonksiyon login sonrası veya sayfa yenilemede tables_update sonrası çağrılır
+        // Bu fonksiyon login sonrası çağrılır
         renderInitialDataIfNeeded(); 
+        // Masalar zaten login_success içinde veya tables_update ile gelecek
     }
 
     function renderTables() {
+        console.log("[renderTables] Fonksiyon çağrıldı. Masa sayısı:", appState.tables ? appState.tables.length : 0); // DEBUG
         tablesGrid.innerHTML = '';
         if (!appState.tables || appState.tables.length === 0) {
              tablesGrid.innerHTML = '<p class="col-span-full text-center text-gray-500">Masa bilgisi bekleniyor...</p>';
