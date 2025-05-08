@@ -44,62 +44,81 @@ let users = [
     { id: 5, username: 'ayse', password: 'ayse1', role: 'waiter' },
 ];
 
+// *** GÜNCELLENMİŞ ÜRÜN LİSTESİ ***
 let products = [ 
     // ET Kategorisi
-    { id: 101, name: "TAVUK (PİLİÇ) ÇEVİRME", price: 220.00, category: "ET" },
-    { id: 102, name: "ET DÖNER PORSİYON - 100 GRAM", price: 125.00, category: "ET" },
-    { id: 103, name: "YAPRAK DÖNER PORSİYON - 100 GRAM", price: 150.00, category: "ET" },
-    { id: 104, name: "TAVUK DÖNER PORSİYON - 100 GRAM", price: 110.00, category: "ET" },
-    { id: 105, name: "KÖFTE PORSİYON - 5 ADET", price: 100.00, category: "ET" },
-    { id: 106, name: "ET İSKENDER - 100 GRAM", price: 200.00, category: "ET" },
-    { id: 107, name: "TAVUK İSKENDER - 100 GRAM", price: 160.00, category: "ET" },
-    { id: 108, name: "ET DÖNER - 500 GRAM", price: 500.00, category: "ET" },
-    { id: 109, name: "YAPRAK DÖNER - 500 GRAM", price: 600.00, category: "ET" },
-    { id: 110, name: "TAVUK DÖNER - 500 GRAM", price: 300.00, category: "ET" },
-    { id: 111, name: "PİRZOLA - 4 ADET", price: 150.00, category: "ET" },
-    { id: 112, name: "KUZU ŞİŞ", price: 150.00, category: "ET" },
-    { id: 113, name: "ADANA DÜRÜM", price: 120.00, category: "ET" }, 
-    { id: 114, name: "ADANA DÜRÜM - SERVİSLİ", price: 150.00, category: "ET" },
-    { id: 115, name: "KANAT - 5 ADET - SERVİSLİ", price: 150.00, category: "ET" },
-    { id: 116, name: "PİŞMEMİŞ KÖFTE - KG", price: 500.00, category: "ET" },
+    { id: 1001, name: "TAVUK (PİLİÇ) ÇEVİRME KG", price: 250.00, category: "ET" },
+    { id: 1002, name: "ET DÖNER PORSİYON (100 GRAM)", price: 185.00, category: "ET" },
+    { id: 1003, name: "YAPRAK DÖNER PORSİYON (100 GRAM)", price: 150.00, category: "ET" }, // Fiyatı menüde yoktu, varsayılan
+    { id: 1004, name: "TAVUK DÖNER PORSİYON (100gr)", price: 145.00, category: "ET" },
+    { id: 1005, name: "KÖFTE PORSİYON (120 gr 6 adet) SERVİSLİ", price: 160.00, category: "ET" },
+    { id: 1006, name: "ET İSKENDER (110 gr)", price: 275.00, category: "ET" },
+    { id: 1007, name: "TAVUK İSKENDER (110 gr)", price: 200.00, category: "ET" },
+    { id: 1008, name: "ET DÖNER (500 GR.)", price: 800.00, category: "ET" },
+    { id: 1009, name: "YAPRAK DÖNER (500 GRAM)", price: 600.00, category: "ET" }, // Fiyatı menüde yoktu, eski fiyattan
+    { id: 1010, name: "TAVUK DÖNER (500 GR.)", price: 400.00, category: "ET" },
+    { id: 1011, name: "ÇITIR PİRZOLA (KELEBEK) KG PİŞMİŞ SERVİSLİ", price: 350.00, category: "ET" },
+    { id: 1012, name: "KUZU ŞİŞ (100 gr.) SERVİSLİ", price: 125.00, category: "ET" },
+    { id: 1013, name: "ADANA DÜRÜM (100 gr.)", price: 125.00, category: "ET" }, 
+    { id: 1014, name: "KANAT IZGARA KG PİŞMİŞ SERVİSLİ", price: 550.00, category: "ET" },
+    { id: 1015, name: "TAVUK PİRZOLA KG PİŞMİŞ SERVİSLİ", price: 530.00, category: "ET" },
+    { id: 1016, name: "CİĞER ŞİŞ (100 gr.) SERVİSLİ", price: 80.00, category: "ET" },
+    { id: 1017, name: "TAVUK ŞİŞ (100 gr.) SERVİSLİ", price: 90.00, category: "ET" },
+
 
     // EKMEK ARASI Kategorisi
-    { id: 201, name: "EKMEK ARASI ET DÖNER - 80 GR", price: 110.00, category: "EKMEK ARASI" },
-    { id: 202, name: "EKMEK ARASI YAPRAK DÖNER - 80 GRAM", price: 120.00, category: "EKMEK ARASI" },
-    { id: 203, name: "EKMEK ARASI TAVUK DÖNER - 80 GR", price: 90.00, category: "EKMEK ARASI" },
-    { id: 204, name: "EKMEK ARASI KÖFTE - 5 ADET", price: 100.00, category: "EKMEK ARASI" },
+    { id: 2001, name: "EKMEK ARASI ET DÖNER (80 GR)", price: 160.00, category: "EKMEK ARASI" },
+    { id: 2002, name: "EKMEK ARASI YAPRAK DÖNER (80 GRAM)", price: 120.00, category: "EKMEK ARASI" }, // Eski fiyattan
+    { id: 2003, name: "TAVUK DÖNER EKMEK ARASI (80 gr)", price: 130.00, category: "EKMEK ARASI" },
+    { id: 2004, name: "EKMEK ARASI KÖFTE (100 gr 5 adet)", price: 130.00, category: "EKMEK ARASI" },
 
     // TOST&HAMBURGER Kategorisi
-    { id: 301, name: "AYVALIK TOSTU", price: 80.00, category: "TOST&HAMBURGER" },
-    { id: 302, name: "KUMRU", price: 80.00, category: "TOST&HAMBURGER" },
-    { id: 303, name: "HAMBURGER", price: 100.00, category: "TOST&HAMBURGER" },
+    { id: 3001, name: "AYVALIK TOSTU", price: 80.00, category: "TOST&HAMBURGER" },
+    { id: 3002, name: "KUMRU", price: 80.00, category: "TOST&HAMBURGER" },
+    { id: 3003, name: "HAMBURGER", price: 100.00, category: "TOST&HAMBURGER" },
 
      // İÇECEK Kategorisi
-    { id: 401, name: "OSMANLI ŞERBETİ - 1.5 LİTRE", price: 30.00, category: "İÇECEK" },
-    { id: 402, name: "SU", price: 10.00, category: "İÇECEK" },
-    { id: 403, name: "KUTU İÇECEKLER", price: 30.00, category: "İÇECEK" }, 
-    { id: 404, name: "AYRAN", price: 10.00, category: "İÇECEK" }, 
-    { id: 405, name: "ÇAY", price: 7.00, category: "İÇECEK" }, 
-    { id: 406, name: "TÜRK KAHVESİ", price: 15.00, category: "İÇECEK" }, 
-    { id: 407, name: "SODA", price: 8.00, category: "İÇECEK" }, 
+    { id: 4001, name: "OSMANLI ŞERBETİ - 1.5 LİTRE", price: 30.00, category: "İÇECEK" },
+    { id: 4002, name: "SU", price: 10.00, category: "İÇECEK" },
+    { id: 4003, name: "KUTU İÇECEKLER", price: 30.00, category: "İÇECEK" }, 
+    { id: 4004, name: "AYRAN", price: 15.00, category: "İÇECEK" }, 
+    { id: 4005, name: "ÇAY", price: 10.00, category: "İÇECEK" }, 
+    { id: 4006, name: "SADE MADEN SUYU", price: 10.00, category: "İÇECEK" }, 
+    { id: 4007, name: "MEYVELİ MADEN SUYU", price: 15.00, category: "İÇECEK" }, 
 
     // TATLI Kategorisi
-    { id: 501, name: "EV BAKLAVASI - KG", price: 350.00, category: "TATLI" },
-    { id: 502, name: "EV BAKLAVASI - 500 GRAM", price: 175.00, category: "TATLI" },
-    { id: 503, name: "AŞURE - KG", price: 150.00, category: "TATLI" },
-    { id: 504, name: "AŞURE - 500 GRAM", price: 75.00, category: "TATLI" },
-    { id: 505, name: "HÖŞMERİM - KG", price: 100.00, category: "TATLI" },
-    { id: 506, name: "HÖŞMERİM - 500 GRAM", price: 50.00, category: "TATLI" },
-    { id: 507, name: "YAĞLI GÖZLEME", price: 30.00, category: "TATLI" }, 
-    { id: 508, name: "İÇLİ GÖZLEME", price: 35.00, category: "TATLI" }, 
-    { id: 509, name: "LAHMACUN", price: 40.00, category: "TATLI" }, 
-    { id: 510, name: "CHEESE KEK - DİLİM", price: 40.00, category: "TATLI" },
-    { id: 511, name: "TRİLEÇE - DİLİM", price: 40.00, category: "TATLI" },
-    { id: 512, name: "COCO STAR - DİLİM", price: 40.00, category: "TATLI" },
-    { id: 513, name: "DİĞER PASTA ÇEŞİTLERİ", price: 35.00, category: "TATLI" },
-    { id: 514, name: "SÜTLAÇ (FIRIN)", price: 30.00, category: "TATLI" }, 
-    { id: 515, name: "REVANİ", price: 28.00, category: "TATLI" } 
+    { id: 5001, name: "EV BAKLAVASI - KG", price: 400.00, category: "TATLI" },
+    { id: 5002, name: "EV BAKLAVASI - 500 GRAM", price: 175.00, category: "TATLI" }, // Fiyatı menüde yoktu, eski fiyattan
+    { id: 5003, name: "AŞURE - KG", price: 125.00, category: "TATLI" },
+    { id: 5004, name: "AŞURE - 500 GRAM", price: 75.00, category: "TATLI" }, // Fiyatı menüde yoktu, eski fiyattan
+    { id: 5005, name: "HÖŞMERİM - KG", price: 110.00, category: "TATLI" },
+    { id: 5006, name: "HÖŞMERİM - 500 GRAM", price: 50.00, category: "TATLI" }, // Fiyatı menüde yoktu, eski fiyattan
+    { id: 5007, name: "YAĞLI GÖZLEME", price: 60.00, category: "TATLI" }, // Fiyat güncellendi
+    { id: 5008, name: "İÇLİ GÖZLEME", price: 35.00, category: "TATLI" }, // Eski fiyattan
+    { id: 5009, name: "LAHMACUN", price: 75.00, category: "TATLI" }, // Fiyat güncellendi
+    { id: 5010, name: "CHEESE KEK - DİLİM", price: 40.00, category: "TATLI" }, // Eski fiyattan
+    { id: 5011, name: "TRİLEÇE DİLİM", price: 70.00, category: "TATLI" }, // Fiyat güncellendi
+    { id: 5012, name: "COCO STAR - DİLİM", price: 40.00, category: "TATLI" }, // Eski fiyattan
+    { id: 5013, name: "YAŞ PASTA (DİLİM 100 gr)", price: 50.00, category: "TATLI" },
+    { id: 5014, name: "KABAK TATLISI KG.", price: 90.00, category: "TATLI" },
+    { id: 5015, name: "DİĞER PASTA ÇEŞİTLERİ", price: 35.00, category: "TATLI" }, // Eski fiyattan
+
+     // ÇORBA Kategorisi
+     { id: 6001, name: "KELLE PAÇA ÇORBA", price: 60.00, category: "ÇORBA" },
+
+     // DİĞER Kategorisi
+     { id: 7001, name: "PİŞMEMİŞ KASAP KÖFTE", price: 620.00, category: "DİĞER" },
+     { id: 7002, name: "PİŞMEMİŞ İNEGÖL KÖFTE", price: 620.00, category: "DİĞER" },
+     { id: 7003, name: "BÜYÜKBAŞ DANA KIYMA KG", price: 650.00, category: "DİĞER" },
+     { id: 7004, name: "BÜYÜKBAŞ DANA KUŞBAŞI", price: 680.00, category: "DİĞER" },
+     { id: 7005, name: "ÇİĞ KÖFTE KG (MARUL-LİMON)", price: 300.00, category: "DİĞER" },
+     { id: 7006, name: "PİZZA KARIŞIK (KÜÇÜK BOY)", price: 125.00, category: "DİĞER" },
+     { id: 7007, name: "MANTI (KIYMALI)", price: 150.00, category: "DİĞER" },
+     { id: 7008, name: "MANTI (MERCİMEKLİ)", price: 100.00, category: "DİĞER" },
+     { id: 7009, name: "SARMA (ZEYTİNYAĞLI) KG.", price: 270.00, category: "DİĞER" },
 ];
+// *** ÜRÜN LİSTESİ SONU ***
+
 
 let tables = []; 
 let completedOrders = []; 
@@ -165,14 +184,12 @@ wss.on('connection', (ws) => {
         }
 
         const { type, payload } = message;
-        // currentUserInfo'yu mesaj işlenmeden önce alalım, reauthenticate için önemli
-        let currentUserInfo = clients.get(ws); 
+        let currentUserInfo = clients.get(ws); // Mesaj işlenmeden önce al
 
         switch (type) {
             case 'login':
                 const user = users.find(u => u.username === payload.username && u.password === payload.password);
                 if (user) {
-                    // Eski bağlantı varsa (aynı kullanıcı adı ile) onu kapatabiliriz (opsiyonel)
                     for (let [client, info] of clients.entries()) {
                         if (info.id === user.id && client !== ws) {
                             console.log(`Eski bağlantı kapatılıyor: ${info.username}`);
@@ -180,8 +197,8 @@ wss.on('connection', (ws) => {
                             clients.delete(client);
                         }
                     }
-                    // Yeni bağlantıyı kaydet
                     clients.set(ws, { id: user.id, username: user.username, role: user.role }); 
+                    currentUserInfo = clients.get(ws); // currentUserInfo'yu güncelle
                     ws.send(JSON.stringify({
                         type: 'login_success',
                         payload: {
@@ -195,14 +212,11 @@ wss.on('connection', (ws) => {
                 }
                 break;
             
-            // *** YENİ: Oturum sürdürme/tekrar doğrulama ***
             case 'reauthenticate':
                  console.log(`[reauthenticate] İstek alındı. Payload:`, payload);
                  if (payload && payload.user && payload.user.id && payload.user.username && payload.user.role) {
-                     // İstemciden gelen kullanıcı bilgisini doğrula (basit kontrol)
                      const foundUser = users.find(u => u.id === payload.user.id && u.username === payload.user.username);
                      if (foundUser) {
-                         // Eski bağlantı varsa kapat (güvenlik ve tutarlılık için)
                          for (let [client, info] of clients.entries()) {
                              if (info.id === foundUser.id && client !== ws) {
                                  console.log(`Eski bağlantı kapatılıyor (reauth): ${info.username}`);
@@ -210,25 +224,20 @@ wss.on('connection', (ws) => {
                                  clients.delete(client);
                              }
                          }
-                         // Yeni bağlantıyı kullanıcıyla ilişkilendir
                          clients.set(ws, payload.user); 
-                         currentUserInfo = payload.user; // currentUserInfo'yu güncelle
+                         currentUserInfo = payload.user; 
                          console.log(`Kullanıcı oturumu sürdürdü: ${currentUserInfo.username}`);
                          // Oturum sürdürüldükten sonra güncel masa verilerini gönder
                          ws.send(JSON.stringify({ type: 'tables_update', payload: { tables: tables } }));
                      } else {
                          console.log("[reauthenticate] Geçersiz kullanıcı bilgisi.");
                          ws.send(JSON.stringify({ type: 'error', payload: { message: 'Geçersiz oturum bilgisi.' } }));
-                         // İsteğe bağlı olarak istemciyi logout'a zorla
                      }
                  } else {
                      console.log("[reauthenticate] Eksik kullanıcı bilgisi.");
                      ws.send(JSON.stringify({ type: 'error', payload: { message: 'Eksik oturum bilgisi.' } }));
                  }
                 break;
-
-            // request_initial_tables artık kullanılmıyor, reauthenticate ile değiştirildi.
-            // case 'request_initial_tables': ... (Bu case bloğu silinebilir veya yorum satırı yapılabilir)
 
             case 'add_order_item':
                 if (!currentUserInfo) { 
