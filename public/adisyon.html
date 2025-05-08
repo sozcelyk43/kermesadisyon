@@ -643,7 +643,8 @@
             categorySection.appendChild(categoryTitle);
 
             const productGrid = document.createElement('div');
-            productGrid.className = 'grid grid-cols-1 sm:grid-cols-2 gap-3'; 
+            // **DEĞİŞİKLİK:** Mobil için 2, orta ekran ve üzeri için 3 sütun
+            productGrid.className = 'grid grid-cols-2 md:grid-cols-3 gap-3'; 
 
             categories[category].sort((a, b) => a.name.localeCompare(b, 'tr')).forEach(product => {
                 const card = document.createElement('div');
