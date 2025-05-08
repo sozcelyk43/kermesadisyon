@@ -28,6 +28,20 @@ app.get('/', (req, res) => {
     });
 });
 
+// YENİ: /menu isteği geldiğinde menu.html dosyasını gönder
+app.get('/menu', (req, res) => {
+    const menuFilePath = path.join(__dirname, 'public', 'menu.html');
+    console.log(`Serving menu file: ${menuFilePath}`); 
+    res.sendFile(menuFilePath, (err) => {
+        if (err) {
+            console.error("Menü dosyası gönderilirken hata:", err);
+             if (!res.headersSent) { 
+                 res.status(err.status || 500).send("Menü dosyası yüklenemedi.");
+            }
+        }
+    });
+});
+
 
 // --- WebSocket Sunucusunu HTTP Sunucusuna Bağlama ---
 const wss = new WebSocket.Server({ server: httpServer });
@@ -49,13 +63,13 @@ let products = [
     // ET Kategorisi
     { id: 1001, name: "TAVUK (PİLİÇ) ÇEVİRME KG", price: 250.00, category: "ET" },
     { id: 1002, name: "ET DÖNER PORSİYON (100 GRAM)", price: 185.00, category: "ET" },
-    { id: 1003, name: "YAPRAK DÖNER PORSİYON (100 GRAM)", price: 150.00, category: "ET" }, // Fiyatı menüde yoktu, varsayılan
+    { id: 1003, name: "YAPRAK DÖNER PORSİYON (100 GRAM)", price: 150.00, category: "ET" }, 
     { id: 1004, name: "TAVUK DÖNER PORSİYON (100gr)", price: 145.00, category: "ET" },
     { id: 1005, name: "KÖFTE PORSİYON (120 gr 6 adet) SERVİSLİ", price: 160.00, category: "ET" },
     { id: 1006, name: "ET İSKENDER (110 gr)", price: 275.00, category: "ET" },
     { id: 1007, name: "TAVUK İSKENDER (110 gr)", price: 200.00, category: "ET" },
     { id: 1008, name: "ET DÖNER (500 GR.)", price: 800.00, category: "ET" },
-    { id: 1009, name: "YAPRAK DÖNER (500 GRAM)", price: 600.00, category: "ET" }, // Fiyatı menüde yoktu, eski fiyattan
+    { id: 1009, name: "YAPRAK DÖNER (500 GRAM)", price: 600.00, category: "ET" }, 
     { id: 1010, name: "TAVUK DÖNER (500 GR.)", price: 400.00, category: "ET" },
     { id: 1011, name: "ÇITIR PİRZOLA (KELEBEK) KG PİŞMİŞ SERVİSLİ", price: 350.00, category: "ET" },
     { id: 1012, name: "KUZU ŞİŞ (100 gr.) SERVİSLİ", price: 125.00, category: "ET" },
@@ -68,7 +82,7 @@ let products = [
 
     // EKMEK ARASI Kategorisi
     { id: 2001, name: "EKMEK ARASI ET DÖNER (80 GR)", price: 160.00, category: "EKMEK ARASI" },
-    { id: 2002, name: "EKMEK ARASI YAPRAK DÖNER (80 GRAM)", price: 120.00, category: "EKMEK ARASI" }, // Eski fiyattan
+    { id: 2002, name: "EKMEK ARASI YAPRAK DÖNER (80 GRAM)", price: 120.00, category: "EKMEK ARASI" }, 
     { id: 2003, name: "TAVUK DÖNER EKMEK ARASI (80 gr)", price: 130.00, category: "EKMEK ARASI" },
     { id: 2004, name: "EKMEK ARASI KÖFTE (100 gr 5 adet)", price: 130.00, category: "EKMEK ARASI" },
 
@@ -88,20 +102,20 @@ let products = [
 
     // TATLI Kategorisi
     { id: 5001, name: "EV BAKLAVASI - KG", price: 400.00, category: "TATLI" },
-    { id: 5002, name: "EV BAKLAVASI - 500 GRAM", price: 175.00, category: "TATLI" }, // Fiyatı menüde yoktu, eski fiyattan
+    { id: 5002, name: "EV BAKLAVASI - 500 GRAM", price: 175.00, category: "TATLI" }, 
     { id: 5003, name: "AŞURE - KG", price: 125.00, category: "TATLI" },
-    { id: 5004, name: "AŞURE - 500 GRAM", price: 75.00, category: "TATLI" }, // Fiyatı menüde yoktu, eski fiyattan
+    { id: 5004, name: "AŞURE - 500 GRAM", price: 75.00, category: "TATLI" }, 
     { id: 5005, name: "HÖŞMERİM - KG", price: 110.00, category: "TATLI" },
-    { id: 5006, name: "HÖŞMERİM - 500 GRAM", price: 50.00, category: "TATLI" }, // Fiyatı menüde yoktu, eski fiyattan
-    { id: 5007, name: "YAĞLI GÖZLEME", price: 60.00, category: "TATLI" }, // Fiyat güncellendi
-    { id: 5008, name: "İÇLİ GÖZLEME", price: 35.00, category: "TATLI" }, // Eski fiyattan
-    { id: 5009, name: "LAHMACUN", price: 75.00, category: "TATLI" }, // Fiyat güncellendi
-    { id: 5010, name: "CHEESE KEK - DİLİM", price: 40.00, category: "TATLI" }, // Eski fiyattan
-    { id: 5011, name: "TRİLEÇE DİLİM", price: 70.00, category: "TATLI" }, // Fiyat güncellendi
-    { id: 5012, name: "COCO STAR - DİLİM", price: 40.00, category: "TATLI" }, // Eski fiyattan
+    { id: 5006, name: "HÖŞMERİM - 500 GRAM", price: 50.00, category: "TATLI" }, 
+    { id: 5007, name: "YAĞLI GÖZLEME", price: 60.00, category: "TATLI" }, 
+    { id: 5008, name: "İÇLİ GÖZLEME", price: 35.00, category: "TATLI" }, 
+    { id: 5009, name: "LAHMACUN", price: 75.00, category: "TATLI" }, 
+    { id: 5010, name: "CHEESE KEK - DİLİM", price: 40.00, category: "TATLI" }, 
+    { id: 5011, name: "TRİLEÇE DİLİM", price: 70.00, category: "TATLI" }, 
+    { id: 5012, name: "COCO STAR - DİLİM", price: 40.00, category: "TATLI" }, 
     { id: 5013, name: "YAŞ PASTA (DİLİM 100 gr)", price: 50.00, category: "TATLI" },
     { id: 5014, name: "KABAK TATLISI KG.", price: 90.00, category: "TATLI" },
-    { id: 5015, name: "DİĞER PASTA ÇEŞİTLERİ", price: 35.00, category: "TATLI" }, // Eski fiyattan
+    { id: 5015, name: "DİĞER PASTA ÇEŞİTLERİ", price: 35.00, category: "TATLI" }, 
 
      // ÇORBA Kategorisi
      { id: 6001, name: "KELLE PAÇA ÇORBA", price: 60.00, category: "ÇORBA" },
@@ -118,7 +132,6 @@ let products = [
      { id: 7009, name: "SARMA (ZEYTİNYAĞLI) KG.", price: 270.00, category: "DİĞER" },
 ];
 // *** ÜRÜN LİSTESİ SONU ***
-
 
 let tables = []; 
 let completedOrders = []; 
@@ -184,7 +197,7 @@ wss.on('connection', (ws) => {
         }
 
         const { type, payload } = message;
-        let currentUserInfo = clients.get(ws); // Mesaj işlenmeden önce al
+        let currentUserInfo = clients.get(ws); 
 
         switch (type) {
             case 'login':
@@ -198,7 +211,7 @@ wss.on('connection', (ws) => {
                         }
                     }
                     clients.set(ws, { id: user.id, username: user.username, role: user.role }); 
-                    currentUserInfo = clients.get(ws); // currentUserInfo'yu güncelle
+                    currentUserInfo = clients.get(ws); 
                     ws.send(JSON.stringify({
                         type: 'login_success',
                         payload: {
@@ -227,7 +240,6 @@ wss.on('connection', (ws) => {
                          clients.set(ws, payload.user); 
                          currentUserInfo = payload.user; 
                          console.log(`Kullanıcı oturumu sürdürdü: ${currentUserInfo.username}`);
-                         // Oturum sürdürüldükten sonra güncel masa verilerini gönder
                          ws.send(JSON.stringify({ type: 'tables_update', payload: { tables: tables } }));
                      } else {
                          console.log("[reauthenticate] Geçersiz kullanıcı bilgisi.");
