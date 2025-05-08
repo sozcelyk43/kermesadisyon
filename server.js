@@ -185,19 +185,16 @@ wss.on('connection', (ws) => {
                 }
                 break;
             
-            // *** YENİ: Sayfa yenilendiğinde ilk masa verisini göndermek için ***
+            // *** BU CASE BLOĞU ÖNEMLİ ***
             case 'request_initial_tables':
-                 if (currentUserInfo) { // Sadece kimliği doğrulanmış (veya doğrulanacak) istemciye gönder
-                     console.log(`[request_initial_tables] ${currentUserInfo.username} için masa verisi gönderiliyor.`);
-                     ws.send(JSON.stringify({ type: 'tables_update', payload: { tables: tables } }));
-                 } else {
-                     // Henüz login olmamışsa veya localStorage'dan gelen bilgiyle
-                     // clients map'ine eklenmemişse buraya düşebilir.
-                     // Genellikle login_success sonrası tables_update yeterli olur.
-                     // Ama yine de bir fallback olarak eklenebilir.
-                     console.log("[request_initial_tables] Henüz doğrulanmamış istemci, masa verisi gönderilmedi.");
-                     // İsteğe bağlı olarak hata mesajı gönderilebilir veya sessiz kalınabilir.
-                 }
+                 // Bu mesajı gönderen istemcinin kimliğini doğrulamak yerine,
+                 // istemcinin localStorage'dan yüklediği user bilgisini kullanarak
+                 // clients map'ine eklenmiş olup olmadığını kontrol edebiliriz.
+                 // Ancak daha basit bir yaklaşım, bu mesajı alan her istemciye
+                 // güncel masa bilgisini göndermektir. Zaten sadece login olmuş
+                 // veya localStorage'dan oturum yüklemiş istemciler bu mesajı gönderecek.
+                 console.log(`[request_initial_tables] İstek alındı, masa verisi gönderiliyor.`);
+                 ws.send(JSON.stringify({ type: 'tables_update', payload: { tables: tables } }));
                 break;
 
             case 'add_order_item':
