@@ -102,7 +102,6 @@ let products = [
 ];
 
 let tables = []; 
-// Kapatılan siparişleri saklamak için dizi (hafızada tutuluyor)
 let completedOrders = []; 
 
 function initializeTables(count = 12) {
@@ -184,6 +183,21 @@ wss.on('connection', (ws) => {
                 } else {
                     ws.send(JSON.stringify({ type: 'login_fail', payload: { error: 'Kullanıcı adı veya şifre hatalı.' } }));
                 }
+                break;
+            
+            // *** YENİ: Sayfa yenilendiğinde ilk masa verisini göndermek için ***
+            case 'request_initial_tables':
+                 if (currentUserInfo) { // Sadece kimliği doğrulanmış (veya doğrulanacak) istemciye gönder
+                     console.log(`[request_initial_tables] ${currentUserInfo.username} için masa verisi gönderiliyor.`);
+                     ws.send(JSON.stringify({ type: 'tables_update', payload: { tables: tables } }));
+                 } else {
+                     // Henüz login olmamışsa veya localStorage'dan gelen bilgiyle
+                     // clients map'ine eklenmemişse buraya düşebilir.
+                     // Genellikle login_success sonrası tables_update yeterli olur.
+                     // Ama yine de bir fallback olarak eklenebilir.
+                     console.log("[request_initial_tables] Henüz doğrulanmamış istemci, masa verisi gönderilmedi.");
+                     // İsteğe bağlı olarak hata mesajı gönderilebilir veya sessiz kalınabilir.
+                 }
                 break;
 
             case 'add_order_item':
@@ -346,7 +360,6 @@ wss.on('connection', (ws) => {
                 }
                 break;
             
-            // *** BU CASE BLOĞU ÖNEMLİ ***
             case 'get_sales_report':
                  if (!currentUserInfo) {
                     ws.send(JSON.stringify({ type: 'error', payload: { message: 'İşlem için giriş yapmalısınız.' } }));
@@ -356,7 +369,6 @@ wss.on('connection', (ws) => {
                      ws.send(JSON.stringify({ type: 'error', payload: { message: 'Rapor görüntüleme yetkiniz yok.' } }));
                     return;
                  }
-                 // Sadece isteyen kasaya raporu gönder
                  ws.send(JSON.stringify({ type: 'sales_report_data', payload: { sales: completedOrders } }));
                  console.log(`${currentUserInfo.username} için satış raporu gönderildi.`);
                 break;
