@@ -9,26 +9,56 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
+            background-color: #f9fafb; /* Slightly lighter gray background */
         }
-        /* Kategori Renkleri */
-        .category-bg-ET { background-color: #fee2e2; } /* red-100 */
-        .category-bg-EKMEK-ARASI { background-color: #ffedd5; } /* orange-100 */
-        .category-bg-TATLI { background-color: #fce7f3; } /* pink-100 */
-        .category-bg-İÇECEK { background-color: #eff6ff; } /* blue-100 */
-        .category-bg-TOSTHAMBURGER { background-color: #f3e8ff; } /* purple-100 */
-        .category-bg-ÇORBA { background-color: #fef9c3; } /* yellow-100 */
-        .category-bg-DİĞER { background-color: #dcfce7; } /* green-100 */
-        .category-bg-default { background-color: #f3f4f6; } /* gray-100 */
+        /* Kategori Alanı Stilleri */
+        .category-section {
+             border: 1px solid #e5e7eb; /* Lighter border */
+             transition: box-shadow 0.3s ease-in-out;
+        }
+         .category-section:hover {
+             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* Hafif hover gölgesi */
+         }
+
+        /* Kategori Renkleri (Arka Plan) */
+        .category-bg-ÇORBA { background-color: #fef9c3; border-left: 4px solid #facc15; } /* yellow-100, yellow-400 border */
+        .category-bg-ET { background-color: #fee2e2; border-left: 4px solid #f87171; } /* red-100, red-400 border */
+        .category-bg-EKMEK-ARASI { background-color: #ffedd5; border-left: 4px solid #fb923c; } /* orange-100, orange-400 border */
+        .category-bg-TOSTHAMBURGER { background-color: #f3e8ff; border-left: 4px solid #a855f7; } /* purple-100, purple-500 border */
+        .category-bg-İÇECEK { background-color: #eff6ff; border-left: 4px solid #60a5fa; } /* blue-100, blue-400 border */
+        .category-bg-TATLI { background-color: #fce7f3; border-left: 4px solid #f472b6; } /* pink-100, pink-400 border */
+        .category-bg-DİĞER { background-color: #dcfce7; border-left: 4px solid #4ade80; } /* green-100, green-400 border */
+        .category-bg-default { background-color: #f3f4f6; border-left: 4px solid #9ca3af; } /* gray-100, gray-400 border */
+
+         /* Kategori Başlık Stili */
+         .category-title {
+             display: flex;
+             align-items: center;
+             gap: 0.5rem; /* İkon ve yazı arası boşluk */
+         }
+         .category-title svg {
+             width: 1.25rem; /* 20px */
+             height: 1.25rem; /* 20px */
+             fill: currentColor; /* Yazı rengini alır */
+             color: #4b5563; /* gray-600 */
+         }
+         /* Menü Öğesi Stili */
+         .menu-item span:first-child { /* Ürün adı */
+             color: #374151; /* gray-700 */
+         }
+         .menu-item span:last-child { /* Fiyat */
+             color: #111827; /* gray-900 */
+         }
     </style>
 </head>
 <body class="bg-gray-50">
     <div class="container mx-auto p-4 md:p-8 max-w-3xl">
-        <header class="mb-8 text-center">
-            <h1 class="text-4xl font-bold text-blue-700">EMET LEZZET GÜNLERİ</h1>
-            <h2 class="text-2xl font-semibold text-gray-700 mt-2">MENÜ</h2>
+        <header class="mb-10 text-center">
+            <h1 class="text-4xl font-bold text-blue-700 mb-2">EMET LEZZET GÜNLERİ</h1>
+            <h2 class="text-2xl font-semibold text-gray-700">MENÜ</h2>
         </header>
 
-        <div id="menuContainer" class="space-y-6">
+        <div id="menuContainer" class="space-y-8"> 
             </div>
 
     </div>
@@ -97,7 +127,7 @@
 
     const menuContainer = document.getElementById('menuContainer');
 
-    // Fiyat formatlama fonksiyonu (adisyon.html ile aynı)
+    // Fiyat formatlama fonksiyonu
     function formatPrice(price) {
         if (typeof price !== 'number' || isNaN(price)) {
             return '0 ₺'; 
@@ -120,6 +150,18 @@
             .replace(/[^a-zA-Z0-9-]/g, '') 
             .toUpperCase(); 
     }
+    
+    // Kategori ikonları (Basit SVG'ler)
+    const categoryIcons = {
+        "ÇORBA": `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M18 6H2a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1zM4 14a1 1 0 0 1-1-1V9a1 1 0 0 1 2 0v4a1 1 0 0 1-1 1zm4 0a1 1 0 0 1-1-1V9a1 1 0 0 1 2 0v4a1 1 0 0 1-1 1zm4 0a1 1 0 0 1-1-1V9a1 1 0 0 1 2 0v4a1 1 0 0 1-1 1zm4 0a1 1 0 0 1-1-1V9a1 1 0 0 1 2 0v4a1 1 0 0 1-1 1zM3 4a1 1 0 0 1 1-1h12a1 1 0 1 1 0 2H4a1 1 0 0 1-1-1z"/></svg>`, // Basit kase ikonu
+        "ET": `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M10 1.14l-8 4V15a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V5.14l-8-4zM4 6.47V14h12V6.47l-6 3-6-3zM10 4.17l4.67 2.3L10 8.77l-4.67-2.3L10 4.17z"/></svg>`, // Basit et/biftek ikonu
+        "EKMEK ARASI": `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M18 8h-1.7c-.2-1.1-.8-2.1-1.6-2.8C13.9 4.5 12.9 4 11.7 4H8.3c-1.2 0-2.2.5-3 1.2-.8.7-1.4 1.7-1.6 2.8H2a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1zm-8 4H4v-2h6v2zm6 0h-4v-2h4v2z"/></svg>`, // Basit sandviç ikonu
+        "TOST&HAMBURGER": `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M19 11h-14a1 1 0 0 1 0-2h14a1 1 0 0 1 0 2zm0-4h-14a1 1 0 0 1 0-2h14a1 1 0 0 1 0 2zm-14 8h14a1 1 0 0 1 0 2h-14a1 1 0 0 1 0-2zM2 4a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1h-14a1 1 0 0 1-1-1v-12z"/></svg>`, // Basit hamburger ikonu
+        "İÇECEK": `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M12 4H8a1 1 0 0 0-1 1v2.23a7.02 7.02 0 0 0-2.9 1.94A.98.98 0 0 0 4 10v6a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-6a.98.98 0 0 0-.1-1.83A7.02 7.02 0 0 0 13 7.23V5a1 1 0 0 0-1-1zm-2 1h4v1.59a7.04 7.04 0 0 0-4 0V5zm-2 4.18c.9-.44 1.9-.68 3-.68s2.1.24 3 .68V15H8V9.18z"/></svg>`, // Basit bardak ikonu
+        "TATLI": `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M10 1a1 1 0 0 0-1 1v2.05A7 7 0 0 0 3.05 9.95 1 1 0 0 0 3 11v5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-5a1 1 0 0 0-.05-.3A7 7 0 0 0 11 4.05V2a1 1 0 0 0-1-1zm-3 10a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm6 0a1 1 0 1 1 0-2 1 1 0 0 1 0 2zM10 6a4 4 0 1 1 0 8 4 4 0 0 1 0-8z"/></svg>`, // Basit dondurma/cupcake ikonu
+        "DİĞER": `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M10 3a1 1 0 0 1 1 1v4h4a1 1 0 1 1 0 2h-4v4a1 1 0 1 1-2 0v-4h-4a1 1 0 1 1 0-2h4v-4a1 1 0 0 1 1-1z"/></svg>` // Basit artı ikonu
+    };
+    const defaultIcon = categoryIcons["DİĞER"]; // Varsayılan ikon
 
     function renderMenu() {
         menuContainer.innerHTML = ''; 
@@ -156,18 +198,22 @@
         sortedCategories.forEach(category => {
             const categorySection = document.createElement('div');
             const bgColorClass = categoryColors[category] || defaultColor;
-            categorySection.className = `mb-6 p-4 rounded-lg shadow-md ${bgColorClass}`; 
+            categorySection.className = `category-section mb-6 p-4 rounded-lg shadow-md ${bgColorClass}`; 
 
             const categoryTitle = document.createElement('h3');
-            categoryTitle.className = 'text-xl font-semibold mb-4 text-gray-800 border-b border-gray-300 pb-2';
-            categoryTitle.textContent = category;
+            // İkonu başlığa ekle
+            categoryTitle.className = 'category-title text-xl font-semibold mb-4 text-gray-800 border-b border-gray-300 pb-2';
+            categoryTitle.innerHTML = `
+                ${categoryIcons[category] || defaultIcon} 
+                <span>${category}</span>
+            `;
             categorySection.appendChild(categoryTitle);
 
             const ul = document.createElement('ul');
             ul.className = 'space-y-2';
             categories[category].sort((a, b) => a.name.localeCompare(b, 'tr')).forEach(product => {
                 const li = document.createElement('li');
-                li.className = 'flex justify-between items-center text-sm';
+                li.className = 'menu-item flex justify-between items-center text-sm';
                 li.innerHTML = `
                     <span class="text-gray-700">${product.name}</span>
                     <span class="font-medium text-gray-900">${formatPrice(product.price)}</span>
