@@ -106,6 +106,7 @@
             body * {
                 visibility: hidden;
             }
+            /* Fiş yazdırma */
             #receiptModalContent, #receiptModalContent * {
                 visibility: visible;
             }
@@ -119,9 +120,46 @@
                 box-sizing: border-box;
                 border: 1px solid #ccc; 
             }
-            #receiptModalContent button {
-                display: none; 
+             /* Satış Raporu yazdırma (A4 dikey) */
+            #salesReportModalContent, #salesReportModalContent * {
+                 visibility: visible;
             }
+             #salesReportModalContent {
+                 position: absolute;
+                 left: 0;
+                 top: 0;
+                 width: 100%; /* Sayfa genişliği */
+                 font-size: 10pt;
+                 padding: 10mm;
+                 box-sizing: border-box;
+             }
+             #salesReportModalContent table {
+                 width: 100%;
+                 border-collapse: collapse;
+             }
+             #salesReportModalContent th, #salesReportModalContent td {
+                 border: 1px solid #ccc;
+                 padding: 2mm;
+                 text-align: left;
+             }
+             #salesReportModalContent th {
+                 background-color: #eee;
+             }
+
+            /* Genel yazdırma gizlemeleri */
+            #receiptModalContent button, 
+            #salesReportModalContent button,
+            #appContainer button,
+            #orderPageContainer button:not(#printReceiptButton):not(#closeReceiptModalButton) /* Fiş butonları hariç */
+             {
+                display: none !important; 
+            }
+            /* Başlıkları gizle (isteğe bağlı) */
+             #appContainer header, #orderPageContainer header {
+                 display: none !important;
+             }
+             /* ... diğer yazdırmada gizlenecek elementler ... */
+
             #receiptModalContent h2 { 
                 font-size: 11pt;
                 font-weight: bold;
@@ -193,12 +231,15 @@
     </div>
 
     <div id="appContainer" class="container mx-auto p-4 md:p-8 hidden">
-        <header class="mb-8 flex justify-between items-center">
+        <header class="mb-8 flex flex-wrap justify-between items-center gap-4">
             <div>
                 <h1 class="text-3xl md:text-4xl font-bold text-blue-700">EMET LEZZET GÜNLERİ ADİSYON</h1>
                 <p class="text-gray-600 mt-1">Aktif Kullanıcı: <span id="activeUserName" class="font-semibold"></span> (<span id="activeUserRole" class="capitalize"></span>)</p>
             </div>
-            <button id="logoutButton" class="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-md transition duration-150">Çıkış Yap</button>
+            <div class="flex gap-2">
+                <button id="salesReportButton" class="bg-teal-500 hover:bg-teal-600 text-white font-semibold py-2 px-4 rounded-md transition duration-150 hidden">Satış Raporu</button>
+                <button id="logoutButton" class="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-md transition duration-150">Çıkış Yap</button>
+            </div>
         </header>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -292,10 +333,31 @@
         </div>
     </div>
 
+    <div id="salesReportModal" class="modal fixed inset-0 bg-gray-900 bg-opacity-75 items-center justify-center z-50">
+        <div id="salesReportModalContent" class="bg-white p-6 md:p-8 rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col">
+            <div class="flex justify-between items-center mb-4">
+                 <h2 class="text-2xl font-semibold text-teal-700">Satış Raporu</h2>
+                 <button id="closeSalesReportModalButton" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+            </div>
+            <div class="flex-grow overflow-y-auto mb-4">
+                <div id="salesReportTableContainer">
+                    <p class="text-center text-gray-500">Rapor yükleniyor veya hiç satış yok...</p>
+                    </div>
+                <div id="salesReportSummary" class="mt-4 pt-4 border-t text-right">
+                     <p class="font-semibold">Toplam Satış Adedi: <span id="totalItemsSold">0</span></p>
+                     <p class="font-bold text-xl">Genel Toplam: <span id="grandTotalSales">0,00 ₺</span></p>
+                </div>
+            </div>
+             <div class="mt-auto pt-4 flex space-x-2">
+                <button id="refreshSalesReportButton" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-semibold p-3 rounded-md transition duration-150">Yenile</button>
+                <button id="printSalesReportButton" class="flex-1 bg-green-500 hover:bg-green-600 text-white font-semibold p-3 rounded-md transition duration-150">Raporu Yazdır</button>
+            </div>
+        </div>
+    </div>
+
+
 <script>
-    // *** YEREL TEST İÇİN URL ***
-    // Render'a yüklerken burayı 'wss://<UYGULAMA_ADINIZ>.onrender.com' olarak değiştirin.
-    const WEBSOCKET_URL = 'https://emet-adisyon.onrender.com'; 
+    const WEBSOCKET_URL = 'wss://emet-adisyon.onrender.com'; // Render URL'niz
     let socket;
 
     const appState = {
@@ -349,6 +411,7 @@
         ],
         tables: [], 
         currentTableId: null, 
+        salesReport: [] // Kapatılan siparişler için (sunucudan gelecek)
     };
 
     // --- DOM Elementleri ---
@@ -363,6 +426,7 @@
     const activeUserNameSpan = document.getElementById('activeUserName'); 
     const activeUserRoleSpan = document.getElementById('activeUserRole'); 
     const logoutButton = document.getElementById('logoutButton');
+    const salesReportButton = document.getElementById('salesReportButton'); // YENİ
     const tablesGrid = document.getElementById('tablesGrid');
     const productsListRef = document.getElementById('productsListRef');
     
@@ -392,6 +456,17 @@
     const printReceiptButton = document.getElementById('printReceiptButton');
     const closeReceiptModalButton = document.getElementById('closeReceiptModalButton');
 
+    // Satış Raporu Modalı Elementleri
+    const salesReportModal = document.getElementById('salesReportModal');
+    const salesReportModalContent = document.getElementById('salesReportModalContent'); // Yazdırma için
+    const closeSalesReportModalButton = document.getElementById('closeSalesReportModalButton');
+    const salesReportTableContainer = document.getElementById('salesReportTableContainer');
+    const totalItemsSoldSpan = document.getElementById('totalItemsSold');
+    const grandTotalSalesSpan = document.getElementById('grandTotalSales');
+    const refreshSalesReportButton = document.getElementById('refreshSalesReportButton');
+    const printSalesReportButton = document.getElementById('printSalesReportButton');
+
+
     // --- Yardımcı Fonksiyonlar ---
     function formatPrice(price) {
         if (typeof price !== 'number' || isNaN(price)) {
@@ -399,6 +474,25 @@
         }
         return price.toFixed(2).replace('.', ',') + ' ₺'; 
     }
+
+    // Timestamp'i okunabilir tarih/saat formatına çevirir
+    function formatTimestamp(timestamp) {
+        if (!timestamp) return '-';
+        try {
+            const date = new Date(timestamp);
+             if (isNaN(date.getTime())) return '-'; // Geçersiz tarih kontrolü
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            return `${day}.${month}.${year} ${hours}:${minutes}`;
+        } catch (e) {
+            console.error("Timestamp formatlama hatası:", e);
+            return '-';
+        }
+    }
+
 
     function getCurrentFormattedDate() {
         const now = new Date();
@@ -529,6 +623,11 @@
                     }
                 }
                 break;
+            // YENİ: Satış raporu verisi geldiğinde
+            case 'sales_report_data':
+                appState.salesReport = message.payload.sales || [];
+                renderSalesReport();
+                break;
             case 'order_update_fail':
                 alert(`Sipariş güncellenemedi: ${message.payload.error}`);
                 break;
@@ -555,8 +654,10 @@
         
         if (appState.user.role === 'cashier') {
             manualProductSection.classList.remove('hidden');
+            salesReportButton.classList.remove('hidden'); // Satış raporu butonunu göster
         } else {
             manualProductSection.classList.add('hidden');
+            salesReportButton.classList.add('hidden'); // Satış raporu butonunu gizle
         }
     }
 
@@ -643,7 +744,6 @@
             categorySection.appendChild(categoryTitle);
 
             const productGrid = document.createElement('div');
-            // **DEĞİŞİKLİK:** Mobil için 2, orta ekran ve üzeri için 3 sütun
             productGrid.className = 'grid grid-cols-2 md:grid-cols-3 gap-3'; 
 
             categories[category].sort((a, b) => a.name.localeCompare(b, 'tr')).forEach(product => {
@@ -843,6 +943,68 @@
         });
     }
 
+    // YENİ: Satış Raporu Modalı'nı render eder
+    function renderSalesReport() {
+        salesReportTableContainer.innerHTML = ''; // Önceki içeriği temizle
+        let totalItems = 0;
+        let grandTotal = 0;
+
+        if (!appState.salesReport || appState.salesReport.length === 0) {
+            salesReportTableContainer.innerHTML = '<p class="text-center text-gray-500 py-6">Henüz tamamlanmış satış yok.</p>';
+            totalItemsSoldSpan.textContent = '0';
+            grandTotalSalesSpan.textContent = formatPrice(0);
+            return;
+        }
+
+        const table = document.createElement('table');
+        table.className = 'w-full text-sm border-collapse border border-gray-300';
+        table.innerHTML = `
+            <thead class="bg-gray-100">
+                <tr>
+                    <th class="border p-2">Zaman</th>
+                    <th class="border p-2">Masa</th>
+                    <th class="border p-2">Ürün</th>
+                    <th class="border p-2 text-center">Adet</th>
+                    <th class="border p-2 text-right">Birim Fiyat</th>
+                    <th class="border p-2 text-right">Toplam</th>
+                    <th class="border p-2">Ekleyen Garson</th>
+                    <th class="border p-2">Açıklama</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        `;
+        const tbody = table.querySelector('tbody');
+
+        // Raporu zamana göre tersten sırala (en yeni üstte)
+        appState.salesReport.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0)); 
+
+        appState.salesReport.forEach(item => {
+            const itemTotal = (item.priceAtOrder || 0) * item.quantity;
+            totalItems += item.quantity;
+            grandTotal += itemTotal;
+
+            const tr = document.createElement('tr');
+            tr.className = 'border-b hover:bg-gray-50';
+            tr.innerHTML = `
+                <td class="border p-2 whitespace-nowrap">${formatTimestamp(item.timestamp)}</td>
+                <td class="border p-2">${item.tableName || '-'}</td>
+                <td class="border p-2">${item.name || (appState.products.find(p=>p.id === item.productId)?.name || 'Bilinmeyen')}</td>
+                <td class="border p-2 text-center">${item.quantity}</td>
+                <td class="border p-2 text-right">${formatPrice(item.priceAtOrder || 0)}</td>
+                <td class="border p-2 text-right">${formatPrice(itemTotal)}</td>
+                <td class="border p-2">${item.waiterUsername || '-'}</td>
+                <td class="border p-2">${item.description || '-'}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        salesReportTableContainer.appendChild(table);
+        totalItemsSoldSpan.textContent = totalItems;
+        grandTotalSalesSpan.textContent = formatPrice(grandTotal);
+    }
+
+
     // --- İşlevler ---
     function handleLogin() {
         const username = usernameInput.value.trim();
@@ -990,10 +1152,38 @@
         window.print();
     }
 
+    // YENİ: Satış raporu modalını açar ve veri ister
+    function openSalesReport() {
+        if (appState.user && appState.user.role === 'cashier') {
+            showLoading("Satış raporu yükleniyor...");
+            sendMessageToServer('get_sales_report', {}); // Sunucudan raporu iste
+            salesReportModal.classList.add('active');
+        } else {
+            alert("Bu özelliği kullanma yetkiniz yok.");
+        }
+    }
+
+    // YENİ: Satış raporunu yazdırır
+    function printSalesReport() {
+         // Yazdırma stilini sadece rapor içeriğine odakla
+        const printContents = document.getElementById('salesReportModalContent').innerHTML;
+        const originalContents = document.body.innerHTML;
+        // Geçici olarak body içeriğini değiştir (daha iyi yazdırma kontrolü için)
+        // document.body.innerHTML = `<div id="salesReportModalContent">${printContents}</div>`; 
+        // window.print();
+        // document.body.innerHTML = originalContents; 
+        // window.location.reload(); // Sayfayı yeniden yükle (eski event listener'ları geri getirmek için)
+        
+        // Alternatif: Sadece modal içeriğini yazdırmayı dene (tarayıcıya bağlı çalışabilir)
+        window.print(); 
+    }
+
+
     function closeReceiptAndResetTable() {
         if (appState.currentTableId && appState.user && appState.user.role === 'cashier') {
             showLoading("Masa kapatılıyor...");
-            sendMessageToServer('close_table', { tableId: appState.currentTableId });
+            // Masa kapatıldığında sunucuya raporu güncellemesi için bilgi gönderilebilir (opsiyonel)
+            sendMessageToServer('close_table', { tableId: appState.currentTableId }); 
         } else if (appState.user && appState.user.role !== 'cashier') {
             alert("Masayı sadece kasa kapatabilir.");
         }
@@ -1007,11 +1197,19 @@
         if (event.key === 'Enter') handleLogin();
     });
     logoutButton.addEventListener('click', handleLogout);
+    salesReportButton.addEventListener('click', openSalesReport); // YENİ
     backToTablesButton.addEventListener('click', showTablesView);
     addManualProductButton.addEventListener('click', addManualProduct); 
     orderPageCompleteOrderButton.addEventListener('click', completeOrderAndShowReceiptOnPage);
     printReceiptButton.addEventListener('click', handlePrintReceipt);
     closeReceiptModalButton.addEventListener('click', closeReceiptAndResetTable);
+    closeSalesReportModalButton.addEventListener('click', () => salesReportModal.classList.remove('active')); // YENİ
+    refreshSalesReportButton.addEventListener('click', () => { // YENİ
+        showLoading("Rapor güncelleniyor...");
+        sendMessageToServer('get_sales_report', {});
+    });
+    printSalesReportButton.addEventListener('click', printSalesReport); // YENİ
+
 
     // Başlangıç
     document.addEventListener('DOMContentLoaded', () => {
