@@ -357,7 +357,9 @@
 
 
 <script>
-    const WEBSOCKET_URL = 'wss://emet-adisyon.onrender.com'; // Render URL'niz
+    // *** YEREL TEST İÇİN URL ***
+    // Render'a yüklerken burayı 'wss://<UYGULAMA_ADINIZ>.onrender.com' olarak değiştirin.
+    const WEBSOCKET_URL = 'wss://emet-adisyon.onrender.com'; 
     let socket;
 
     const appState = {
@@ -411,7 +413,7 @@
         ],
         tables: [], 
         currentTableId: null, 
-        salesReport: [] // Kapatılan siparişler için (sunucudan gelecek)
+        salesReport: [] 
     };
 
     // --- DOM Elementleri ---
@@ -426,7 +428,7 @@
     const activeUserNameSpan = document.getElementById('activeUserName'); 
     const activeUserRoleSpan = document.getElementById('activeUserRole'); 
     const logoutButton = document.getElementById('logoutButton');
-    const salesReportButton = document.getElementById('salesReportButton'); // YENİ
+    const salesReportButton = document.getElementById('salesReportButton'); 
     const tablesGrid = document.getElementById('tablesGrid');
     const productsListRef = document.getElementById('productsListRef');
     
@@ -456,9 +458,8 @@
     const printReceiptButton = document.getElementById('printReceiptButton');
     const closeReceiptModalButton = document.getElementById('closeReceiptModalButton');
 
-    // Satış Raporu Modalı Elementleri
     const salesReportModal = document.getElementById('salesReportModal');
-    const salesReportModalContent = document.getElementById('salesReportModalContent'); // Yazdırma için
+    const salesReportModalContent = document.getElementById('salesReportModalContent'); 
     const closeSalesReportModalButton = document.getElementById('closeSalesReportModalButton');
     const salesReportTableContainer = document.getElementById('salesReportTableContainer');
     const totalItemsSoldSpan = document.getElementById('totalItemsSold');
@@ -480,7 +481,7 @@
         if (!timestamp) return '-';
         try {
             const date = new Date(timestamp);
-             if (isNaN(date.getTime())) return '-'; // Geçersiz tarih kontrolü
+             if (isNaN(date.getTime())) return '-'; 
             const day = String(date.getDate()).padStart(2, '0');
             const month = String(date.getMonth() + 1).padStart(2, '0');
             const year = date.getFullYear();
@@ -528,9 +529,33 @@
         socket.onopen = () => {
             console.log("WebSocket bağlantısı kuruldu.");
             hideLoading();
-            loginModal.classList.add('active');
-            appContainer.classList.add('hidden');
-            orderPageContainer.classList.remove('active'); 
+            // Oturum kontrolü
+            const storedUser = localStorage.getItem('adisyonUser');
+            if (storedUser) {
+                try {
+                    appState.user = JSON.parse(storedUser);
+                    console.log("Oturum bulundu:", appState.user.username);
+                    activeUserNameSpan.textContent = appState.user.username;
+                    activeUserRoleSpan.textContent = appState.user.role;
+                    loginModal.classList.remove('active');
+                    appContainer.classList.remove('hidden'); 
+                    orderPageContainer.classList.remove('active');
+                    updateUIForRole();
+                    // Sunucuya kim olduğumuzu bildirebilir veya ilk veri talebinde bulunabiliriz (opsiyonel)
+                    // sendMessageToServer('identify_user', { userId: appState.user.id }); 
+                    // Veya sadece masa güncellemesini bekle
+                } catch (e) {
+                    console.error("localStorage'dan kullanıcı verisi okunamadı:", e);
+                    localStorage.removeItem('adisyonUser'); // Bozuk veriyi temizle
+                    loginModal.classList.add('active'); // Hata durumunda login göster
+                    appContainer.classList.add('hidden');
+                    orderPageContainer.classList.remove('active');
+                }
+            } else {
+                loginModal.classList.add('active'); // Oturum yoksa login göster
+                appContainer.classList.add('hidden');
+                orderPageContainer.classList.remove('active');
+            }
         };
 
         socket.onmessage = (event) => {
@@ -558,6 +583,8 @@
             orderPageContainer.classList.remove('active'); 
             loginModal.classList.add('active'); 
             hideLoading();
+            appState.user = null; // Bağlantı kopunca kullanıcı durumunu sıfırla
+            localStorage.removeItem('adisyonUser'); // Oturumu da temizle
         };
     }
 
@@ -582,6 +609,9 @@
                     appState.user = userDataFromServer; 
                     appState.tables = message.payload.tables || []; 
                     if (appState.user && typeof appState.user.username !== 'undefined' && typeof appState.user.role !== 'undefined') {
+                        // Oturumu localStorage'a kaydet
+                        localStorage.setItem('adisyonUser', JSON.stringify(appState.user)); 
+
                         activeUserNameSpan.textContent = appState.user.username;
                         activeUserRoleSpan.textContent = appState.user.role;
                         loginModal.classList.remove('active');
@@ -590,19 +620,21 @@
                         loginError.textContent = '';
                         renderInitialData();
                         updateUIForRole();
-                        console.log("Giriş başarılı:", appState.user.username, "Rol:", appState.user.role);
+                        console.log("Giriş başarılı ve kaydedildi:", appState.user.username, "Rol:", appState.user.role);
                     } else {
                         console.error("Login success, ancak kullanıcı verisi (username/role) eksik/hatalı.", "appState.user:", appState.user);
-                        showLoginError("Giriş bilgileri eksik (kod: CL01_V5).");
+                        showLoginError("Giriş bilgileri eksik (kod: CL01_V6).");
                         appState.user = null; 
+                        localStorage.removeItem('adisyonUser'); // Hatalıysa temizle
                         loginModal.classList.add('active');
                         appContainer.classList.add('hidden');
                         orderPageContainer.classList.remove('active');
                     }
                 } else {
                     console.error("Login success mesajı alındı, ancak payload veya kullanıcı verisi (user/waiter) hatalı/eksik.", "Payload:", message.payload);
-                    showLoginError("Sunucudan geçersiz giriş yanıtı (kod: CL02_V5).");
+                    showLoginError("Sunucudan geçersiz giriş yanıtı (kod: CL02_V6).");
                     appState.user = null;
+                    localStorage.removeItem('adisyonUser'); // Hatalıysa temizle
                     loginModal.classList.add('active');
                     appContainer.classList.add('hidden');
                     orderPageContainer.classList.remove('active');
@@ -610,20 +642,25 @@
                 break;
             case 'login_fail':
                 showLoginError(message.payload.error || "Kullanıcı adı veya şifre hatalı.");
+                localStorage.removeItem('adisyonUser'); // Başarısız girişte temizle
                 break;
             case 'tables_update':
-                appState.tables = message.payload.tables;
-                renderTables(); 
-                if (orderPageContainer.classList.contains('active') && appState.currentTableId) {
-                    const updatedTable = appState.tables.find(t => t.id === appState.currentTableId);
-                    if (updatedTable) {
-                        renderOrderPageForTable(updatedTable); 
-                    } else { 
-                        showTablesView();
+                 // Sadece giriş yapılmışsa tabloları güncelle (ilk bağlantıda login beklenir)
+                if(appState.user){ 
+                    appState.tables = message.payload.tables;
+                    renderTables(); 
+                    if (orderPageContainer.classList.contains('active') && appState.currentTableId) {
+                        const updatedTable = appState.tables.find(t => t.id === appState.currentTableId);
+                        if (updatedTable) {
+                            renderOrderPageForTable(updatedTable); 
+                        } else { 
+                            showTablesView();
+                        }
                     }
+                } else {
+                    console.log("Kullanıcı girişi bekleniyor, tables_update şimdilik işlenmedi.");
                 }
                 break;
-            // YENİ: Satış raporu verisi geldiğinde
             case 'sales_report_data':
                 appState.salesReport = message.payload.sales || [];
                 renderSalesReport();
@@ -654,10 +691,10 @@
         
         if (appState.user.role === 'cashier') {
             manualProductSection.classList.remove('hidden');
-            salesReportButton.classList.remove('hidden'); // Satış raporu butonunu göster
+            salesReportButton.classList.remove('hidden'); 
         } else {
             manualProductSection.classList.add('hidden');
-            salesReportButton.classList.add('hidden'); // Satış raporu butonunu gizle
+            salesReportButton.classList.add('hidden'); 
         }
     }
 
@@ -905,7 +942,7 @@
                 
                 let waiterNameHTML = '';
                  if (item.waiterUsername) {
-                     waiterNameHTML = `<p class="text-xs text-blue-500 pl-1 mt-1">Ekleyen: ${item.waiterUsername}</p>`;
+                     waiterNameHTML = `<p class="text-xs text-blue-500 pl-1 mt-1">Ekleyen: ${item.waiterUsername} (${formatTimestamp(item.timestamp)})</p>`; // Zaman damgası eklendi
                  }
 
 
@@ -943,9 +980,9 @@
         });
     }
 
-    // YENİ: Satış Raporu Modalı'nı render eder
+    // Satış Raporu Modalı'nı render eder
     function renderSalesReport() {
-        salesReportTableContainer.innerHTML = ''; // Önceki içeriği temizle
+        salesReportTableContainer.innerHTML = ''; 
         let totalItems = 0;
         let grandTotal = 0;
 
@@ -961,7 +998,7 @@
         table.innerHTML = `
             <thead class="bg-gray-100">
                 <tr>
-                    <th class="border p-2">Zaman</th>
+                    <th class="border p-2">Kapanış Zamanı</th>
                     <th class="border p-2">Masa</th>
                     <th class="border p-2">Ürün</th>
                     <th class="border p-2 text-center">Adet</th>
@@ -969,6 +1006,7 @@
                     <th class="border p-2 text-right">Toplam</th>
                     <th class="border p-2">Ekleyen Garson</th>
                     <th class="border p-2">Açıklama</th>
+                    <th class="border p-2">Ekleme Zamanı</th> 
                 </tr>
             </thead>
             <tbody>
@@ -976,25 +1014,28 @@
         `;
         const tbody = table.querySelector('tbody');
 
-        // Raporu zamana göre tersten sırala (en yeni üstte)
-        appState.salesReport.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0)); 
+        // Raporu kapanış zamanına göre tersten sırala
+        appState.salesReport.sort((a, b) => (b.closingTimestamp || 0) - (a.closingTimestamp || 0)); 
 
         appState.salesReport.forEach(item => {
             const itemTotal = (item.priceAtOrder || 0) * item.quantity;
             totalItems += item.quantity;
             grandTotal += itemTotal;
+            
+            let itemName = item.name || (appState.products.find(p=>p.id === item.productId)?.name || 'Bilinmeyen');
 
             const tr = document.createElement('tr');
             tr.className = 'border-b hover:bg-gray-50';
             tr.innerHTML = `
-                <td class="border p-2 whitespace-nowrap">${formatTimestamp(item.timestamp)}</td>
+                <td class="border p-2 whitespace-nowrap">${formatTimestamp(item.closingTimestamp)}</td>
                 <td class="border p-2">${item.tableName || '-'}</td>
-                <td class="border p-2">${item.name || (appState.products.find(p=>p.id === item.productId)?.name || 'Bilinmeyen')}</td>
+                <td class="border p-2">${itemName}</td>
                 <td class="border p-2 text-center">${item.quantity}</td>
                 <td class="border p-2 text-right">${formatPrice(item.priceAtOrder || 0)}</td>
                 <td class="border p-2 text-right">${formatPrice(itemTotal)}</td>
                 <td class="border p-2">${item.waiterUsername || '-'}</td>
                 <td class="border p-2">${item.description || '-'}</td>
+                <td class="border p-2 whitespace-nowrap">${formatTimestamp(item.timestamp)}</td> 
             `;
             tbody.appendChild(tr);
         });
@@ -1019,6 +1060,7 @@
     }
     
     function handleLogout() {
+        localStorage.removeItem('adisyonUser'); // Çıkışta localStorage'ı temizle
         sendMessageToServer('logout', {});
         appState.user = null;
         appState.tables = [];
@@ -1027,7 +1069,7 @@
         orderPageContainer.classList.remove('active'); 
         usernameInput.value = '';
         passwordInput.value = '';
-        console.log("Çıkış yapıldı.");
+        console.log("Çıkış yapıldı ve oturum temizlendi.");
     }
 
     function showTablesView() {
@@ -1134,7 +1176,7 @@
             
             let waiterHTML = '';
             if (item.waiterUsername) {
-                 waiterHTML = `<span class="item-waiter">Ekleyen: ${item.waiterUsername}</span>`;
+                 waiterHTML = `<span class="item-waiter">Ekleyen: ${item.waiterUsername} (${formatTimestamp(item.timestamp)})</span>`; // Zaman damgası eklendi
             }
 
             const itemDiv = document.createElement('div');
@@ -1152,29 +1194,19 @@
         window.print();
     }
 
-    // YENİ: Satış raporu modalını açar ve veri ister
+    // Satış raporu modalını açar ve veri ister
     function openSalesReport() {
         if (appState.user && appState.user.role === 'cashier') {
             showLoading("Satış raporu yükleniyor...");
-            sendMessageToServer('get_sales_report', {}); // Sunucudan raporu iste
+            sendMessageToServer('get_sales_report', {}); 
             salesReportModal.classList.add('active');
         } else {
             alert("Bu özelliği kullanma yetkiniz yok.");
         }
     }
 
-    // YENİ: Satış raporunu yazdırır
+    // Satış raporunu yazdırır
     function printSalesReport() {
-         // Yazdırma stilini sadece rapor içeriğine odakla
-        const printContents = document.getElementById('salesReportModalContent').innerHTML;
-        const originalContents = document.body.innerHTML;
-        // Geçici olarak body içeriğini değiştir (daha iyi yazdırma kontrolü için)
-        // document.body.innerHTML = `<div id="salesReportModalContent">${printContents}</div>`; 
-        // window.print();
-        // document.body.innerHTML = originalContents; 
-        // window.location.reload(); // Sayfayı yeniden yükle (eski event listener'ları geri getirmek için)
-        
-        // Alternatif: Sadece modal içeriğini yazdırmayı dene (tarayıcıya bağlı çalışabilir)
         window.print(); 
     }
 
@@ -1182,7 +1214,6 @@
     function closeReceiptAndResetTable() {
         if (appState.currentTableId && appState.user && appState.user.role === 'cashier') {
             showLoading("Masa kapatılıyor...");
-            // Masa kapatıldığında sunucuya raporu güncellemesi için bilgi gönderilebilir (opsiyonel)
             sendMessageToServer('close_table', { tableId: appState.currentTableId }); 
         } else if (appState.user && appState.user.role !== 'cashier') {
             alert("Masayı sadece kasa kapatabilir.");
@@ -1197,22 +1228,23 @@
         if (event.key === 'Enter') handleLogin();
     });
     logoutButton.addEventListener('click', handleLogout);
-    salesReportButton.addEventListener('click', openSalesReport); // YENİ
+    salesReportButton.addEventListener('click', openSalesReport); 
     backToTablesButton.addEventListener('click', showTablesView);
     addManualProductButton.addEventListener('click', addManualProduct); 
     orderPageCompleteOrderButton.addEventListener('click', completeOrderAndShowReceiptOnPage);
     printReceiptButton.addEventListener('click', handlePrintReceipt);
     closeReceiptModalButton.addEventListener('click', closeReceiptAndResetTable);
-    closeSalesReportModalButton.addEventListener('click', () => salesReportModal.classList.remove('active')); // YENİ
-    refreshSalesReportButton.addEventListener('click', () => { // YENİ
+    closeSalesReportModalButton.addEventListener('click', () => salesReportModal.classList.remove('active')); 
+    refreshSalesReportButton.addEventListener('click', () => { 
         showLoading("Rapor güncelleniyor...");
         sendMessageToServer('get_sales_report', {});
     });
-    printSalesReportButton.addEventListener('click', printSalesReport); // YENİ
+    printSalesReportButton.addEventListener('click', printSalesReport); 
 
 
     // Başlangıç
     document.addEventListener('DOMContentLoaded', () => {
+        // Oturum kontrolü ve WebSocket bağlantısı connectWebSocket içinde yapılacak
         connectWebSocket(); 
     });
 
