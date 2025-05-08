@@ -165,12 +165,22 @@ wss.on('connection', (ws) => {
         }
 
         const { type, payload } = message;
-        const currentUserInfo = clients.get(ws); 
+        // currentUserInfo'yu mesaj işlenmeden önce alalım, reauthenticate için önemli
+        let currentUserInfo = clients.get(ws); 
 
         switch (type) {
             case 'login':
                 const user = users.find(u => u.username === payload.username && u.password === payload.password);
                 if (user) {
+                    // Eski bağlantı varsa (aynı kullanıcı adı ile) onu kapatabiliriz (opsiyonel)
+                    for (let [client, info] of clients.entries()) {
+                        if (info.id === user.id && client !== ws) {
+                            console.log(`Eski bağlantı kapatılıyor: ${info.username}`);
+                            client.terminate(); 
+                            clients.delete(client);
+                        }
+                    }
+                    // Yeni bağlantıyı kaydet
                     clients.set(ws, { id: user.id, username: user.username, role: user.role }); 
                     ws.send(JSON.stringify({
                         type: 'login_success',
@@ -185,19 +195,40 @@ wss.on('connection', (ws) => {
                 }
                 break;
             
-            case 'request_initial_tables':
-                 // Kullanıcı bilgisini clients map'inden almayı dene
-                 const requestingUser = clients.get(ws);
-                 console.log(`[request_initial_tables] İstek alındı. İsteyen kullanıcı bilgisi (clients map'inden):`, requestingUser);
-                 // Güvenlik için, sadece map içinde olanlara gönderelim
-                 if (requestingUser) { 
-                     console.log(`[request_initial_tables] ${requestingUser.username} için masa verisi gönderiliyor.`);
-                     ws.send(JSON.stringify({ type: 'tables_update', payload: { tables: tables } }));
+            // *** YENİ: Oturum sürdürme/tekrar doğrulama ***
+            case 'reauthenticate':
+                 console.log(`[reauthenticate] İstek alındı. Payload:`, payload);
+                 if (payload && payload.user && payload.user.id && payload.user.username && payload.user.role) {
+                     // İstemciden gelen kullanıcı bilgisini doğrula (basit kontrol)
+                     const foundUser = users.find(u => u.id === payload.user.id && u.username === payload.user.username);
+                     if (foundUser) {
+                         // Eski bağlantı varsa kapat (güvenlik ve tutarlılık için)
+                         for (let [client, info] of clients.entries()) {
+                             if (info.id === foundUser.id && client !== ws) {
+                                 console.log(`Eski bağlantı kapatılıyor (reauth): ${info.username}`);
+                                 client.terminate(); 
+                                 clients.delete(client);
+                             }
+                         }
+                         // Yeni bağlantıyı kullanıcıyla ilişkilendir
+                         clients.set(ws, payload.user); 
+                         currentUserInfo = payload.user; // currentUserInfo'yu güncelle
+                         console.log(`Kullanıcı oturumu sürdürdü: ${currentUserInfo.username}`);
+                         // Oturum sürdürüldükten sonra güncel masa verilerini gönder
+                         ws.send(JSON.stringify({ type: 'tables_update', payload: { tables: tables } }));
+                     } else {
+                         console.log("[reauthenticate] Geçersiz kullanıcı bilgisi.");
+                         ws.send(JSON.stringify({ type: 'error', payload: { message: 'Geçersiz oturum bilgisi.' } }));
+                         // İsteğe bağlı olarak istemciyi logout'a zorla
+                     }
                  } else {
-                     console.log("[request_initial_tables] İstek yapan istemci 'clients' map'inde bulunamadı, masa verisi gönderilmedi.");
-                     // İsteğe bağlı: ws.send(JSON.stringify({ type: 'error', payload: { message: 'Önce giriş yapmalısınız.' } }));
+                     console.log("[reauthenticate] Eksik kullanıcı bilgisi.");
+                     ws.send(JSON.stringify({ type: 'error', payload: { message: 'Eksik oturum bilgisi.' } }));
                  }
                 break;
+
+            // request_initial_tables artık kullanılmıyor, reauthenticate ile değiştirildi.
+            // case 'request_initial_tables': ... (Bu case bloğu silinebilir veya yorum satırı yapılabilir)
 
             case 'add_order_item':
                 if (!currentUserInfo) { 
@@ -360,7 +391,7 @@ wss.on('connection', (ws) => {
                 break;
             
             case 'get_sales_report':
-                 console.log(`[get_sales_report] İstek alındı. İsteyen kullanıcı bilgisi (clients map'inden):`, currentUserInfo); // DEBUG
+                 console.log(`[get_sales_report] İstek alındı. İsteyen kullanıcı bilgisi (clients map'inden):`, currentUserInfo); 
                  if (!currentUserInfo) {
                     ws.send(JSON.stringify({ type: 'error', payload: { message: 'İşlem için giriş yapmalısınız.' } }));
                     return;
