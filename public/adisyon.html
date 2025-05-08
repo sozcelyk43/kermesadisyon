@@ -541,8 +541,9 @@
                     appContainer.classList.remove('hidden'); 
                     orderPageContainer.classList.remove('active');
                     updateUIForRole();
-                    // Sunucudan güncel masa durumunu isteyelim (sayfa yenilendiğinde önemli)
+                    // Sunucudan güncel masa durumunu isteyelim
                     sendMessageToServer('request_initial_tables', {}); 
+                    // renderInitialData() artık burada çağrılmıyor, tables_update bekleniyor
                 } catch (e) {
                     console.error("localStorage'dan kullanıcı verisi okunamadı:", e);
                     localStorage.removeItem('adisyonUser'); 
@@ -583,8 +584,6 @@
             loginModal.classList.add('active'); 
             hideLoading();
             // Oturum kalıcılığı için user'ı sıfırlamıyoruz, sadece bağlantı bekleniyor
-            // appState.user = null; 
-            // localStorage.removeItem('adisyonUser'); 
         };
     }
 
@@ -595,12 +594,9 @@
             console.log("Sunucuya gönderildi:", message);
         } else {
             console.error("WebSocket bağlantısı açık değil.");
-            // Bağlantı kapalıysa ve kullanıcı varsa tekrar bağlanmayı dene (opsiyonel)
             if(appState.user && (!socket || socket.readyState === WebSocket.CLOSED)){
                  console.log("Bağlantı kapalı, yeniden bağlanılıyor...");
                  connectWebSocket();
-                 // Mesajı hemen göndermeye çalışma, bağlantının kurulmasını bekle.
-                 // İstenirse mesajı bir kuyruğa alıp bağlantı açılınca gönderilebilir.
             } else {
                 showLoginError("Sunucuya mesaj gönderilemedi. Bağlantı sorunu.");
             }
@@ -625,7 +621,7 @@
                         appContainer.classList.remove('hidden');
                         orderPageContainer.classList.remove('active');
                         loginError.textContent = '';
-                        renderInitialData();
+                        renderInitialData(); // Login sonrası ilk render
                         updateUIForRole();
                         console.log("Giriş başarılı ve kaydedildi:", appState.user.username, "Rol:", appState.user.role);
                     } else {
@@ -656,14 +652,14 @@
                 if(appState.user){ 
                     console.log("Tables update alindi, isleniyor...");
                     appState.tables = message.payload.tables;
-                    renderTables(); 
-                    // Eğer sipariş sayfasındaysak ve masa hala mevcutsa, o sayfayı da güncelle
+                    renderTables(); // Masaları render et
+                    renderInitialDataIfNeeded(); // Diğer başlangıç renderları (product grid vb.)
+                    
                     if (orderPageContainer.classList.contains('active') && appState.currentTableId) {
                         const updatedTable = appState.tables.find(t => t.id === appState.currentTableId);
                         if (updatedTable) {
                             renderOrderPageForTable(updatedTable); 
                         } else { 
-                            // Masa silinmiş veya ID değişmişse masalar ekranına dön
                             console.log(`Güncellenen masa (${appState.currentTableId}) bulunamadı, masalar ekranına dönülüyor.`);
                             showTablesView();
                         }
@@ -708,13 +704,25 @@
             salesReportButton.classList.add('hidden'); 
         }
     }
+    
+    // YENİ: Gerekliyse başlangıç render fonksiyonlarını çağırır
+    let initialDataRendered = false;
+    function renderInitialDataIfNeeded() {
+        if (!initialDataRendered) {
+            renderProductGrid(); 
+            renderProductsForReference();
+            populateManualCategorySelect(); 
+            initialDataRendered = true;
+            console.log("İlk data render edildi (ürün grid, referans, kategori select).");
+        }
+    }
+
 
     // --- Render Fonksiyonları ---
     function renderInitialData() {
-        // renderTables() artık tables_update mesajı ile tetiklenecek
-        renderProductGrid(); 
-        renderProductsForReference();
-        populateManualCategorySelect(); 
+        // Bu fonksiyon artık doğrudan çağrılmıyor, tables_update bekleniyor.
+        // renderTables(); // tables_update içinde çağrılıyor
+        renderInitialDataIfNeeded(); // Diğerlerini çağır
     }
 
     function renderTables() {
@@ -1081,6 +1089,7 @@
         usernameInput.value = '';
         passwordInput.value = '';
         console.log("Çıkış yapıldı ve oturum temizlendi.");
+        initialDataRendered = false; // Tekrar login olunca render etsin
     }
 
     function showTablesView() {
@@ -1187,7 +1196,7 @@
             
             let waiterHTML = '';
             if (item.waiterUsername) {
-                 waiterHTML = `<span class="item-waiter">Ekleyen: ${item.waiterUsername} (${formatTimestamp(item.timestamp)})</span>`; // Zaman damgası eklendi
+                 waiterHTML = `<span class="item-waiter">Ekleyen: ${item.waiterUsername} (${formatTimestamp(item.timestamp)})</span>`; 
             }
 
             const itemDiv = document.createElement('div');
