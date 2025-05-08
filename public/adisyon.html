@@ -541,8 +541,8 @@
                     appContainer.classList.remove('hidden'); 
                     orderPageContainer.classList.remove('active');
                     updateUIForRole();
-                    // Sunucudan güncel masa durumunu isteyelim
-                    sendMessageToServer('request_initial_tables', {}); 
+                    // *** YENİ: Oturum sürdürme mesajı gönder ***
+                    sendMessageToServer('reauthenticate', { user: appState.user }); 
                 } catch (e) {
                     console.error("localStorage'dan kullanıcı verisi okunamadı:", e);
                     localStorage.removeItem('adisyonUser'); 
@@ -595,8 +595,16 @@
             console.error("WebSocket bağlantısı açık değil.");
             if(appState.user && (!socket || socket.readyState === WebSocket.CLOSED)){
                  console.log("Bağlantı kapalı, yeniden bağlanılıyor...");
-                 connectWebSocket();
-            } else {
+                 // Yeniden bağlanma denemesi arasında küçük bir gecikme ekleyebiliriz
+                 setTimeout(() => connectWebSocket(), 1000); 
+            } else if (!appState.user) {
+                 // Kullanıcı giriş yapmamışsa login ekranına yönlendir
+                 loginModal.classList.add('active');
+                 appContainer.classList.add('hidden');
+                 orderPageContainer.classList.remove('active');
+                 showLoginError("Lütfen önce giriş yapın.");
+            }
+             else {
                 showLoginError("Sunucuya mesaj gönderilemedi. Bağlantı sorunu.");
             }
         }
@@ -625,7 +633,7 @@
                         console.log("Giriş başarılı ve kaydedildi:", appState.user.username, "Rol:", appState.user.role);
                     } else {
                         console.error("Login success, ancak kullanıcı verisi (username/role) eksik/hatalı.", "appState.user:", appState.user);
-                        showLoginError("Giriş bilgileri eksik (kod: CL01_V6).");
+                        showLoginError("Giriş bilgileri eksik (kod: CL01_V7).");
                         appState.user = null; 
                         localStorage.removeItem('adisyonUser'); 
                         loginModal.classList.add('active');
@@ -634,7 +642,7 @@
                     }
                 } else {
                     console.error("Login success mesajı alındı, ancak payload veya kullanıcı verisi (user/waiter) hatalı/eksik.", "Payload:", message.payload);
-                    showLoginError("Sunucudan geçersiz giriş yanıtı (kod: CL02_V6).");
+                    showLoginError("Sunucudan geçersiz giriş yanıtı (kod: CL02_V7).");
                     appState.user = null;
                     localStorage.removeItem('adisyonUser'); 
                     loginModal.classList.add('active');
@@ -649,7 +657,7 @@
             case 'tables_update':
                 // Sadece giriş yapılmışsa veya localStorage'dan yüklenmişse tabloları işle
                 if(appState.user){ 
-                    console.log("[tables_update] Mesaj alındı. appState.user:", appState.user); // DEBUG
+                    console.log("[tables_update] Mesaj alındı ve işleniyor. appState.user:", appState.user); // DEBUG
                     appState.tables = message.payload.tables;
                     renderTables(); // Masaları render et
                     renderInitialDataIfNeeded(); // Diğer başlangıç renderları (product grid vb.)
@@ -664,7 +672,7 @@
                         }
                     }
                 } else {
-                    console.log("[tables_update] Kullanıcı girişi/oturumu bekleniyor, tables_update şimdilik işlenmedi.");
+                    console.log("[tables_update] Kullanıcı bilgisi (appState.user) henüz set edilmemiş, tables_update işlenmedi.");
                 }
                 break;
             case 'sales_report_data':
@@ -719,13 +727,11 @@
 
     // --- Render Fonksiyonları ---
     function renderInitialData() {
-        // Bu fonksiyon login sonrası çağrılır
         renderInitialDataIfNeeded(); 
-        // Masalar zaten login_success içinde veya tables_update ile gelecek
     }
 
     function renderTables() {
-        console.log("[renderTables] Fonksiyon çağrıldı. Masa sayısı:", appState.tables ? appState.tables.length : 0); // DEBUG
+        console.log("[renderTables] Fonksiyon çağrıldı. Masa sayısı:", appState.tables ? appState.tables.length : 0); 
         tablesGrid.innerHTML = '';
         if (!appState.tables || appState.tables.length === 0) {
              tablesGrid.innerHTML = '<p class="col-span-full text-center text-gray-500">Masa bilgisi bekleniyor...</p>';
