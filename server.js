@@ -185,16 +185,18 @@ wss.on('connection', (ws) => {
                 }
                 break;
             
-            // *** BU CASE BLOĞU ÖNEMLİ ***
             case 'request_initial_tables':
-                 // Bu mesajı gönderen istemcinin kimliğini doğrulamak yerine,
-                 // istemcinin localStorage'dan yüklediği user bilgisini kullanarak
-                 // clients map'ine eklenmiş olup olmadığını kontrol edebiliriz.
-                 // Ancak daha basit bir yaklaşım, bu mesajı alan her istemciye
-                 // güncel masa bilgisini göndermektir. Zaten sadece login olmuş
-                 // veya localStorage'dan oturum yüklemiş istemciler bu mesajı gönderecek.
-                 console.log(`[request_initial_tables] İstek alındı, masa verisi gönderiliyor.`);
-                 ws.send(JSON.stringify({ type: 'tables_update', payload: { tables: tables } }));
+                 // Kullanıcı bilgisini clients map'inden almayı dene
+                 const requestingUser = clients.get(ws);
+                 console.log(`[request_initial_tables] İstek alındı. İsteyen kullanıcı bilgisi (clients map'inden):`, requestingUser);
+                 // Güvenlik için, sadece map içinde olanlara gönderelim
+                 if (requestingUser) { 
+                     console.log(`[request_initial_tables] ${requestingUser.username} için masa verisi gönderiliyor.`);
+                     ws.send(JSON.stringify({ type: 'tables_update', payload: { tables: tables } }));
+                 } else {
+                     console.log("[request_initial_tables] İstek yapan istemci 'clients' map'inde bulunamadı, masa verisi gönderilmedi.");
+                     // İsteğe bağlı: ws.send(JSON.stringify({ type: 'error', payload: { message: 'Önce giriş yapmalısınız.' } }));
+                 }
                 break;
 
             case 'add_order_item':
@@ -358,6 +360,7 @@ wss.on('connection', (ws) => {
                 break;
             
             case 'get_sales_report':
+                 console.log(`[get_sales_report] İstek alındı. İsteyen kullanıcı bilgisi (clients map'inden):`, currentUserInfo); // DEBUG
                  if (!currentUserInfo) {
                     ws.send(JSON.stringify({ type: 'error', payload: { message: 'İşlem için giriş yapmalısınız.' } }));
                     return;
