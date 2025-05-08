@@ -541,18 +541,17 @@
                     appContainer.classList.remove('hidden'); 
                     orderPageContainer.classList.remove('active');
                     updateUIForRole();
-                    // Sunucuya kim olduğumuzu bildirebilir veya ilk veri talebinde bulunabiliriz (opsiyonel)
-                    // sendMessageToServer('identify_user', { userId: appState.user.id }); 
-                    // Veya sadece masa güncellemesini bekle
+                    // Sunucudan güncel masa durumunu isteyelim (sayfa yenilendiğinde önemli)
+                    sendMessageToServer('request_initial_tables', {}); 
                 } catch (e) {
                     console.error("localStorage'dan kullanıcı verisi okunamadı:", e);
-                    localStorage.removeItem('adisyonUser'); // Bozuk veriyi temizle
-                    loginModal.classList.add('active'); // Hata durumunda login göster
+                    localStorage.removeItem('adisyonUser'); 
+                    loginModal.classList.add('active'); 
                     appContainer.classList.add('hidden');
                     orderPageContainer.classList.remove('active');
                 }
             } else {
-                loginModal.classList.add('active'); // Oturum yoksa login göster
+                loginModal.classList.add('active'); 
                 appContainer.classList.add('hidden');
                 orderPageContainer.classList.remove('active');
             }
@@ -583,8 +582,9 @@
             orderPageContainer.classList.remove('active'); 
             loginModal.classList.add('active'); 
             hideLoading();
-            appState.user = null; // Bağlantı kopunca kullanıcı durumunu sıfırla
-            localStorage.removeItem('adisyonUser'); // Oturumu da temizle
+            // Oturum kalıcılığı için user'ı sıfırlamıyoruz, sadece bağlantı bekleniyor
+            // appState.user = null; 
+            // localStorage.removeItem('adisyonUser'); 
         };
     }
 
@@ -595,7 +595,15 @@
             console.log("Sunucuya gönderildi:", message);
         } else {
             console.error("WebSocket bağlantısı açık değil.");
-            showLoginError("Sunucuya mesaj gönderilemedi. Bağlantı sorunu.");
+            // Bağlantı kapalıysa ve kullanıcı varsa tekrar bağlanmayı dene (opsiyonel)
+            if(appState.user && (!socket || socket.readyState === WebSocket.CLOSED)){
+                 console.log("Bağlantı kapalı, yeniden bağlanılıyor...");
+                 connectWebSocket();
+                 // Mesajı hemen göndermeye çalışma, bağlantının kurulmasını bekle.
+                 // İstenirse mesajı bir kuyruğa alıp bağlantı açılınca gönderilebilir.
+            } else {
+                showLoginError("Sunucuya mesaj gönderilemedi. Bağlantı sorunu.");
+            }
         }
     }
 
@@ -609,7 +617,6 @@
                     appState.user = userDataFromServer; 
                     appState.tables = message.payload.tables || []; 
                     if (appState.user && typeof appState.user.username !== 'undefined' && typeof appState.user.role !== 'undefined') {
-                        // Oturumu localStorage'a kaydet
                         localStorage.setItem('adisyonUser', JSON.stringify(appState.user)); 
 
                         activeUserNameSpan.textContent = appState.user.username;
@@ -625,7 +632,7 @@
                         console.error("Login success, ancak kullanıcı verisi (username/role) eksik/hatalı.", "appState.user:", appState.user);
                         showLoginError("Giriş bilgileri eksik (kod: CL01_V6).");
                         appState.user = null; 
-                        localStorage.removeItem('adisyonUser'); // Hatalıysa temizle
+                        localStorage.removeItem('adisyonUser'); 
                         loginModal.classList.add('active');
                         appContainer.classList.add('hidden');
                         orderPageContainer.classList.remove('active');
@@ -634,7 +641,7 @@
                     console.error("Login success mesajı alındı, ancak payload veya kullanıcı verisi (user/waiter) hatalı/eksik.", "Payload:", message.payload);
                     showLoginError("Sunucudan geçersiz giriş yanıtı (kod: CL02_V6).");
                     appState.user = null;
-                    localStorage.removeItem('adisyonUser'); // Hatalıysa temizle
+                    localStorage.removeItem('adisyonUser'); 
                     loginModal.classList.add('active');
                     appContainer.classList.add('hidden');
                     orderPageContainer.classList.remove('active');
@@ -642,23 +649,27 @@
                 break;
             case 'login_fail':
                 showLoginError(message.payload.error || "Kullanıcı adı veya şifre hatalı.");
-                localStorage.removeItem('adisyonUser'); // Başarısız girişte temizle
+                localStorage.removeItem('adisyonUser'); 
                 break;
             case 'tables_update':
-                 // Sadece giriş yapılmışsa tabloları güncelle (ilk bağlantıda login beklenir)
+                // Sadece giriş yapılmışsa veya localStorage'dan yüklenmişse tabloları işle
                 if(appState.user){ 
+                    console.log("Tables update alindi, isleniyor...");
                     appState.tables = message.payload.tables;
                     renderTables(); 
+                    // Eğer sipariş sayfasındaysak ve masa hala mevcutsa, o sayfayı da güncelle
                     if (orderPageContainer.classList.contains('active') && appState.currentTableId) {
                         const updatedTable = appState.tables.find(t => t.id === appState.currentTableId);
                         if (updatedTable) {
                             renderOrderPageForTable(updatedTable); 
                         } else { 
+                            // Masa silinmiş veya ID değişmişse masalar ekranına dön
+                            console.log(`Güncellenen masa (${appState.currentTableId}) bulunamadı, masalar ekranına dönülüyor.`);
                             showTablesView();
                         }
                     }
                 } else {
-                    console.log("Kullanıcı girişi bekleniyor, tables_update şimdilik işlenmedi.");
+                    console.log("Kullanıcı girişi/oturumu bekleniyor, tables_update şimdilik işlenmedi.");
                 }
                 break;
             case 'sales_report_data':
@@ -700,7 +711,7 @@
 
     // --- Render Fonksiyonları ---
     function renderInitialData() {
-        renderTables();
+        // renderTables() artık tables_update mesajı ile tetiklenecek
         renderProductGrid(); 
         renderProductsForReference();
         populateManualCategorySelect(); 
@@ -709,7 +720,7 @@
     function renderTables() {
         tablesGrid.innerHTML = '';
         if (!appState.tables || appState.tables.length === 0) {
-             tablesGrid.innerHTML = '<p class="col-span-full text-center text-gray-500">Sunucudan masa verisi yüklenemedi veya hiç masa yok.</p>';
+             tablesGrid.innerHTML = '<p class="col-span-full text-center text-gray-500">Masa bilgisi bekleniyor...</p>';
              return;
         }
         appState.tables.forEach(table => {
@@ -1060,7 +1071,7 @@
     }
     
     function handleLogout() {
-        localStorage.removeItem('adisyonUser'); // Çıkışta localStorage'ı temizle
+        localStorage.removeItem('adisyonUser'); 
         sendMessageToServer('logout', {});
         appState.user = null;
         appState.tables = [];
