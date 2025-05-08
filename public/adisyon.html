@@ -543,7 +543,6 @@
                     updateUIForRole();
                     // Sunucudan güncel masa durumunu isteyelim
                     sendMessageToServer('request_initial_tables', {}); 
-                    // renderInitialData() artık burada çağrılmıyor, tables_update bekleniyor
                 } catch (e) {
                     console.error("localStorage'dan kullanıcı verisi okunamadı:", e);
                     localStorage.removeItem('adisyonUser'); 
@@ -583,7 +582,7 @@
             orderPageContainer.classList.remove('active'); 
             loginModal.classList.add('active'); 
             hideLoading();
-            // Oturum kalıcılığı için user'ı sıfırlamıyoruz, sadece bağlantı bekleniyor
+            // Oturum kalıcılığı için user'ı sıfırlamıyoruz
         };
     }
 
@@ -705,7 +704,7 @@
         }
     }
     
-    // YENİ: Gerekliyse başlangıç render fonksiyonlarını çağırır
+    // Gerekliyse başlangıç render fonksiyonlarını çağırır
     let initialDataRendered = false;
     function renderInitialDataIfNeeded() {
         if (!initialDataRendered) {
@@ -720,9 +719,8 @@
 
     // --- Render Fonksiyonları ---
     function renderInitialData() {
-        // Bu fonksiyon artık doğrudan çağrılmıyor, tables_update bekleniyor.
-        // renderTables(); // tables_update içinde çağrılıyor
-        renderInitialDataIfNeeded(); // Diğerlerini çağır
+        // Bu fonksiyon login sonrası veya sayfa yenilemede tables_update sonrası çağrılır
+        renderInitialDataIfNeeded(); 
     }
 
     function renderTables() {
@@ -1089,7 +1087,7 @@
         usernameInput.value = '';
         passwordInput.value = '';
         console.log("Çıkış yapıldı ve oturum temizlendi.");
-        initialDataRendered = false; // Tekrar login olunca render etsin
+        initialDataRendered = false; 
     }
 
     function showTablesView() {
