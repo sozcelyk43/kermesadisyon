@@ -910,8 +910,8 @@
             categorySection.appendChild(categoryTitle);
 
             const productGrid = document.createElement('div');
-            // **DEĞİŞİKLİK:** Hızlı satış için 4 sütun, normal sipariş için mobil 2, tablet+ 3 sütun
-            productGrid.className = forQuickSale ? 'grid grid-cols-3 sm:grid-cols-4 gap-2' : 'grid grid-cols-2 md:grid-cols-3 gap-3'; 
+            // **DEĞİŞİKLİK:** Hızlı satış için 5 sütun (sm ve üzeri), normal sipariş için mobil 2, tablet+ 3 sütun
+            productGrid.className = forQuickSale ? 'grid grid-cols-3 sm:grid-cols-5 gap-2' : 'grid grid-cols-2 md:grid-cols-3 gap-3'; 
 
             categories[category].sort((a, b) => a.name.localeCompare(b, 'tr')).forEach(product => {
                 const card = document.createElement('div');
