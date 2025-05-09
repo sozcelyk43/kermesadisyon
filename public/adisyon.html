@@ -61,22 +61,22 @@
          }
 
         /* Kategori Alanı Renkleri */
-        .category-section-bg-ET-TAVUK { background-color: #fee2e2; } /* red-100 */
-        .category-section-bg-ATIŞTIRMALIK { background-color: #ffedd5; } /* orange-100 */
-        .category-section-bg-TATLI { background-color: #fce7f3; } /* pink-100 */
-        .category-section-bg-İÇECEK { background-color: #eff6ff; } /* blue-100 */
-        .category-section-bg-ÇORBA { background-color: #fef9c3; } /* yellow-100 */
-        .category-section-bg-DİĞER { background-color: #dcfce7; } /* green-100 */
-        .category-section-bg-default { background-color: #f3f4f6; } /* gray-100 */
+        .category-section-bg-ET-TAVUK { background-color: #fee2e2; } 
+        .category-section-bg-ATIŞTIRMALIK { background-color: #ffedd5; } 
+        .category-section-bg-TATLI { background-color: #fce7f3; } 
+        .category-section-bg-İÇECEK { background-color: #eff6ff; } 
+        .category-section-bg-ÇORBA { background-color: #fef9c3; } 
+        .category-section-bg-DİĞER { background-color: #dcfce7; } 
+        .category-section-bg-default { background-color: #f3f4f6; } 
 
         /* Ürün Kartı Renkleri (Kategorinin daha koyu tonu) */
-        .product-card-bg-ET-TAVUK { background-color: #fecaca; } /* red-200 */
-        .product-card-bg-ATIŞTIRMALIK { background-color: #fed7aa; } /* orange-200 */
-        .product-card-bg-TATLI { background-color: #fbcfe8; } /* pink-200 */
-        .product-card-bg-İÇECEK { background-color: #dbeafe; } /* blue-200 */
-        .product-card-bg-ÇORBA { background-color: #fef08a; } /* yellow-200 */
-        .product-card-bg-DİĞER { background-color: #bbf7d0; } /* green-200 */
-        .product-card-bg-default { background-color: #e5e7eb; } /* gray-200 */
+        .product-card-bg-ET-TAVUK { background-color: #fecaca; } 
+        .product-card-bg-ATIŞTIRMALIK { background-color: #fed7aa; } 
+        .product-card-bg-TATLI { background-color: #fbcfe8; } 
+        .product-card-bg-İÇECEK { background-color: #dbeafe; } 
+        .product-card-bg-ÇORBA { background-color: #fef08a; } 
+        .product-card-bg-DİĞER { background-color: #bbf7d0; } 
+        .product-card-bg-default { background-color: #e5e7eb; } 
 
 
         /* Ürün Kartı Görünümü */
@@ -184,14 +184,20 @@
             #receiptModalContent button, 
             #salesReportModalContent button,
             #quickSaleModal button:not(#printReceiptButton), 
-            #appContainer button,
+            #appContainer button#logoutButton, /* Sadece çıkış yap butonu gizlensin ana ekranda */
             #orderPageContainer button:not(#printReceiptButton):not(#closeReceiptModalButton) 
              {
                 display: none !important; 
             }
-             #appContainer header, #orderPageContainer header, #quickSaleModal header {
-                 display: none !important;
+             #appContainer header h1, #appContainer header p, /* Başlıklar kalsın */
+             #orderPageContainer header, 
+             #quickSaleModal header {
+                 /* display: none !important; */ /* Başlıklar yazdırmada görünebilir */
              }
+             #quickSaleEntryButton, #salesReportButton { /* Bu butonlar yazdırmada kesinlikle gizli */
+                display: none !important;
+             }
+
 
             #receiptModalContent h2 { 
                 font-size: 11pt;
@@ -270,7 +276,6 @@
                 <p class="text-gray-600 mt-1">Aktif Kullanıcı: <span id="activeUserName" class="font-semibold"></span> (<span id="activeUserRole" class="capitalize"></span>)</p>
             </div>
             <div class="flex gap-2">
-                <button id="quickSaleEntryButton" class="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-md transition duration-150 hidden">Hızlı Satış</button>
                 <button id="salesReportButton" class="bg-teal-500 hover:bg-teal-600 text-white font-semibold py-2 px-4 rounded-md transition duration-150 hidden">Satış Raporu</button>
                 <button id="logoutButton" class="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-md transition duration-150">Çıkış Yap</button>
             </div>
@@ -279,7 +284,14 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <main class="md:col-span-2">
                 <section id="tablesSection" class="mb-8">
-                    <h2 class="text-2xl font-semibold mb-4 text-gray-700">Masalar</h2>
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-2xl font-semibold text-gray-700">Masalar</h2>
+                        <div id="quickSaleButtonContainerTop" class="hidden"> 
+                            <button id="quickSaleEntryButton" class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-lg shadow-md text-lg transition duration-150">
+                                HIZLI SATIŞ
+                            </button>
+                        </div>
+                    </div>
                     <div id="tablesGrid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                         </div>
                 </section>
@@ -426,22 +438,20 @@
 
     const appState = {
         user: null, 
-        // GÜNCELLENMİŞ ÜRÜN LİSTESİ
         products: [ 
-            // ET - TAVUK Kategorisi (ID'ler 1000'den başlasın)
             { id: 1001, name: "TAVUK (PİLİÇ) ÇEVİRME KG", price: 250.00, category: "ET - TAVUK" },
             { id: 1002, name: "ET DÖNER PORSİYON (100 GRAM)", price: 185.00, category: "ET - TAVUK" },
-            { id: 1003, name: "YAPRAK DÖNER PORSİYON (100 GRAM)", price: 150.00, category: "ET - TAVUK" },
-            { id: 1004, name: "TAVUK DÖNER PORSİYON (100gr)", price: 150.00, category: "ET - TAVUK" },
-            { id: 1005, name: "KÖFTE PORSİYON (120 gr 6 adet) SERVİSLİ", price: 150.00, category: "ET - TAVUK" },
+            { id: 1003, name: "YAPRAK DÖNER PORSİYON (100 GRAM)", price: 150.00, category: "ET - TAVUK" }, 
+            { id: 1004, name: "TAVUK DÖNER PORSİYON (100gr)", price: 150.00, category: "ET - TAVUK" }, 
+            { id: 1005, name: "KÖFTE PORSİYON (120 gr 6 adet) SERVİSLİ", price: 150.00, category: "ET - TAVUK" }, 
             { id: 1006, name: "ET İSKENDER (110 gr)", price: 275.00, category: "ET - TAVUK" },
             { id: 1007, name: "TAVUK İSKENDER (110 gr)", price: 200.00, category: "ET - TAVUK" },
-            { id: 1008, name: "ET DÖNER - KG", price: 1300.00, category: "ET - TAVUK" },
-            { id: 1009, name: "ET DÖNER - 500 GR", price: 650.00, category: "ET - TAVUK" },
-            { id: 1010, name: "TAVUK DÖNER - KG", price: 800.00, category: "ET - TAVUK" },
-            { id: 1011, name: "TAVUK DÖNER - 500 GR", price: 400.00, category: "ET - TAVUK" },
-            { id: 1012, name: "KUZU ŞİŞ (100 gr.) SERVİSLİ", price: 150.00, category: "ET - TAVUK" },
-            { id: 1013, name: "ADANA ŞİŞ (100 gr.)", price: 150.00, category: "ET - TAVUK" },
+            { id: 1008, name: "ET DÖNER - KG", price: 1300.00, category: "ET - TAVUK" }, 
+            { id: 1009, name: "ET DÖNER - 500 GR", price: 650.00, category: "ET - TAVUK" }, 
+            { id: 1010, name: "TAVUK DÖNER - KG", price: 800.00, category: "ET - TAVUK" }, 
+            { id: 1011, name: "TAVUK DÖNER - 500 GR", price: 400.00, category: "ET - TAVUK" }, 
+            { id: 1012, name: "KUZU ŞİŞ (100 gr.) SERVİSLİ", price: 150.00, category: "ET - TAVUK" }, 
+            { id: 1013, name: "ADANA ŞİŞ (100 gr.)", price: 150.00, category: "ET - TAVUK" }, 
             { id: 1014, name: "PİRZOLA - 4 ADET", price: 250.00, category: "ET - TAVUK" },
             { id: 1015, name: "TAVUK FAJİTA", price: 200.00, category: "ET - TAVUK" },
             { id: 1016, name: "ÇITIR PİRZOLA (KELEBEK) KG PİŞMİŞ SERVİSLİ", price: 350.00, category: "ET - TAVUK" },
@@ -450,20 +460,18 @@
             { id: 1019, name: "CİĞER ŞİŞ (100 gr.) SERVİSLİ", price: 80.00, category: "ET - TAVUK" },
             { id: 1020, name: "TAVUK ŞİŞ (100 gr.) SERVİSLİ", price: 90.00, category: "ET - TAVUK" },
 
-            // ATIŞTIRMALIK Kategorisi (ID'ler 2000'den başlasın)
-            { id: 2001, name: "EKMEK ARASI ET DÖNER (80 GR)", price: 160.00, category: "ATIŞTIRMALIK" },
-            { id: 2002, name: "EKMEK ARASI KÖFTE (100 gr 5 adet)", price: 130.00, category: "ATIŞTIRMALIK" },
-            { id: 2003, name: "TAVUK DÖNER EKMEK ARASI (80 gr)", price: 130.00, category: "ATIŞTIRMALIK" },
+            { id: 2001, name: "EKMEK ARASI ET DÖNER (80 GR)", price: 160.00, category: "ATIŞTIRMALIK" }, 
+            { id: 2002, name: "EKMEK ARASI KÖFTE (100 gr 5 adet)", price: 130.00, category: "ATIŞTIRMALIK" }, 
+            { id: 2003, name: "TAVUK DÖNER EKMEK ARASI (80 gr)", price: 130.00, category: "ATIŞTIRMALIK" }, 
             { id: 2004, name: "PİZZA KARIŞIK (ORTA BOY)", price: 150.00, category: "ATIŞTIRMALIK" },
             { id: 2005, name: "PİZZA KARIŞIK (BÜYÜK BOY)", price: 200.00, category: "ATIŞTIRMALIK" },
             { id: 2006, name: "LAHMACUN", price: 75.00, category: "ATIŞTIRMALIK" },
             { id: 2007, name: "PİDE ÇEŞİTLERİ", price: 100.00, category: "ATIŞTIRMALIK" },
-            { id: 2008, name: "AYVALIK TOSTU", price: 100.00, category: "ATIŞTIRMALIK" },
-            { id: 2009, name: "HAMBURGER", price: 120.00, category: "ATIŞTIRMALIK" },
+            { id: 2008, name: "AYVALIK TOSTU", price: 100.00, category: "ATIŞTIRMALIK" }, 
+            { id: 2009, name: "HAMBURGER", price: 120.00, category: "ATIŞTIRMALIK" }, 
             { id: 2010, name: "ÇİĞ KÖFTE KG (MARUL-LİMON)", price: 300.00, category: "ATIŞTIRMALIK" },
-            { id: 2011, name: "KUMRU", price: 80.00, category: "ATIŞTIRMALIK" }, // Eski menüden eklendi
+            { id: 2011, name: "KUMRU", price: 80.00, category: "ATIŞTIRMALIK" }, 
 
-            // İÇECEK Kategorisi (ID'ler 3000'den başlasın)
             { id: 3001, name: "OSMANLI ŞERBETİ - 1 LİTRE", price: 75.00, category: "İÇECEK" },
             { id: 3002, name: "LİMONATA", price: 75.00, category: "İÇECEK" },
             { id: 3003, name: "SU", price: 10.00, category: "İÇECEK" },
@@ -472,9 +480,8 @@
             { id: 3006, name: "GAZOZ", price: 25.00, category: "İÇECEK" },
             { id: 3007, name: "SADE MADEN SUYU", price: 10.00, category: "İÇECEK" },
             { id: 3008, name: "MEYVELİ MADEN SUYU", price: 15.00, category: "İÇECEK" },
-            { id: 3009, name: "KUTU İÇECEKLER", price: 30.00, category: "İÇECEK" }, // Eski menüden
+            { id: 3009, name: "KUTU İÇECEKLER", price: 30.00, category: "İÇECEK" }, 
 
-            // TATLI Kategorisi (ID'ler 4000'den başlasın)
             { id: 4001, name: "EV BAKLAVASI - KG", price: 400.00, category: "TATLI" },
             { id: 4002, name: "EV BAKLAVASI - 500 GRAM", price: 200.00, category: "TATLI" },
             { id: 4003, name: "EV BAKLAVASI - PORSİYON", price: 75.00, category: "TATLI" },
@@ -485,14 +492,12 @@
             { id: 4008, name: "İÇLİ GÖZLEME", price: 60.00, category: "TATLI" },
             { id: 4009, name: "TRİLEÇE DİLİM", price: 70.00, category: "TATLI" },
             { id: 4010, name: "KABAK TATLISI KG.", price: 90.00, category: "TATLI" },
-            { id: 4011, name: "AŞURE - KG", price: 125.00, category: "TATLI" }, // Eski menüden
-            { id: 4012, name: "HÖŞMERİM - KG", price: 110.00, category: "TATLI" }, // Eski menüden
+            { id: 4011, name: "AŞURE - KG", price: 125.00, category: "TATLI" }, 
+            { id: 4012, name: "HÖŞMERİM - KG", price: 110.00, category: "TATLI" }, 
 
-            // ÇORBA Kategorisi (ID'ler 5000'den başlasın)
             { id: 5001, name: "KELLE PAÇA ÇORBA", price: 60.00, category: "ÇORBA" },
             { id: 5002, name: "TARHANA ÇORBA", price: 60.00, category: "ÇORBA" },
             
-            // DİĞER Kategorisi (ID'ler 6000'den başlasın)
             { id: 6001, name: "PİŞMEMİŞ KASAP KÖFTE", price: 620.00, category: "DİĞER" },
             { id: 6002, name: "PİŞMEMİŞ İNEGÖL KÖFTE", price: 620.00, category: "DİĞER" },
             { id: 6003, name: "BÜYÜKBAŞ DANA KIYMA KG", price: 650.00, category: "DİĞER" },
