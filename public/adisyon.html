@@ -184,17 +184,17 @@
             #receiptModalContent button, 
             #salesReportModalContent button,
             #quickSaleModal button:not(#printReceiptButton), 
-            #appContainer button#logoutButton, /* Sadece çıkış yap butonu gizlensin ana ekranda */
+            #appContainer button#logoutButton, 
             #orderPageContainer button:not(#printReceiptButton):not(#closeReceiptModalButton) 
              {
                 display: none !important; 
             }
-             #appContainer header h1, #appContainer header p, /* Başlıklar kalsın */
+             #appContainer header h1, #appContainer header p, 
              #orderPageContainer header, 
              #quickSaleModal header {
-                 /* display: none !important; */ /* Başlıklar yazdırmada görünebilir */
              }
-             #quickSaleEntryButton, #salesReportButton { /* Bu butonlar yazdırmada kesinlikle gizli */
+             #quickSaleButtonContainerTop, /* Hızlı satış ana butonu yazdırmada gizli */
+             #salesReportButton { 
                 display: none !important;
              }
 
@@ -286,11 +286,12 @@
                 <section id="tablesSection" class="mb-8">
                     <div class="flex justify-between items-center mb-4">
                         <h2 class="text-2xl font-semibold text-gray-700">Masalar</h2>
-                        <div id="quickSaleButtonContainerTop" class="hidden"> 
-                            <button id="quickSaleEntryButton" class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-lg shadow-md text-lg transition duration-150">
-                                HIZLI SATIŞ
-                            </button>
-                        </div>
+                        
+                    </div>
+                    <div id="quickSaleButtonContainerTop" class="mb-6 hidden"> 
+                        <button id="quickSaleEntryButton" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-lg shadow-md text-lg transition duration-150">
+                            HIZLI SATIŞ
+                        </button>
                     </div>
                     <div id="tablesGrid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                         </div>
@@ -526,6 +527,7 @@
     const logoutButton = document.getElementById('logoutButton');
     const salesReportButton = document.getElementById('salesReportButton'); 
     const quickSaleEntryButton = document.getElementById('quickSaleEntryButton'); 
+    const quickSaleButtonContainerTop = document.getElementById('quickSaleButtonContainerTop'); // Hızlı satış butonunun kapsayıcısı
     const tablesGrid = document.getElementById('tablesGrid');
     const productsListRef = document.getElementById('productsListRef');
     
@@ -822,11 +824,11 @@
         if (appState.user.role === 'cashier') {
             manualProductSection.classList.remove('hidden');
             salesReportButton.classList.remove('hidden'); 
-            quickSaleEntryButton.classList.remove('hidden'); 
+            quickSaleButtonContainerTop.classList.remove('hidden'); // Hızlı satış butonunun kapsayıcısını göster
         } else {
             manualProductSection.classList.add('hidden');
             salesReportButton.classList.add('hidden'); 
-            quickSaleEntryButton.classList.add('hidden'); 
+            quickSaleButtonContainerTop.classList.add('hidden'); // Hızlı satış butonunun kapsayıcısını gizle
         }
     }
     
