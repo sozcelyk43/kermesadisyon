@@ -58,78 +58,82 @@ let users = [
     { id: 5, username: 'ayse', password: 'ayse1', role: 'waiter' },
 ];
 
+// *** GÜNCELLENMİŞ ÜRÜN LİSTESİ ***
 let products = [ 
-    // ET Kategorisi
-    { id: 1001, name: "TAVUK (PİLİÇ) ÇEVİRME KG", price: 250.00, category: "ET" },
-    { id: 1002, name: "ET DÖNER PORSİYON (100 GRAM)", price: 185.00, category: "ET" },
-    { id: 1003, name: "YAPRAK DÖNER PORSİYON (100 GRAM)", price: 150.00, category: "ET" }, 
-    { id: 1004, name: "TAVUK DÖNER PORSİYON (100gr)", price: 145.00, category: "ET" },
-    { id: 1005, name: "KÖFTE PORSİYON (120 gr 6 adet) SERVİSLİ", price: 160.00, category: "ET" },
-    { id: 1006, name: "ET İSKENDER (110 gr)", price: 275.00, category: "ET" },
-    { id: 1007, name: "TAVUK İSKENDER (110 gr)", price: 200.00, category: "ET" },
-    { id: 1008, name: "ET DÖNER (500 GR.)", price: 800.00, category: "ET" },
-    { id: 1009, name: "YAPRAK DÖNER (500 GRAM)", price: 600.00, category: "ET" }, 
-    { id: 1010, name: "TAVUK DÖNER (500 GR.)", price: 400.00, category: "ET" },
-    { id: 1011, name: "ÇITIR PİRZOLA (KELEBEK) KG PİŞMİŞ SERVİSLİ", price: 350.00, category: "ET" },
-    { id: 1012, name: "KUZU ŞİŞ (100 gr.) SERVİSLİ", price: 125.00, category: "ET" },
-    { id: 1013, name: "ADANA DÜRÜM (100 gr.)", price: 125.00, category: "ET" }, 
-    { id: 1014, name: "KANAT IZGARA KG PİŞMİŞ SERVİSLİ", price: 550.00, category: "ET" },
-    { id: 1015, name: "TAVUK PİRZOLA KG PİŞMİŞ SERVİSLİ", price: 530.00, category: "ET" },
-    { id: 1016, name: "CİĞER ŞİŞ (100 gr.) SERVİSLİ", price: 80.00, category: "ET" },
-    { id: 1017, name: "TAVUK ŞİŞ (100 gr.) SERVİSLİ", price: 90.00, category: "ET" },
+    // ET - TAVUK Kategorisi (ID'ler 1000'den başlasın)
+    { id: 1001, name: "TAVUK (PİLİÇ) ÇEVİRME KG", price: 250.00, category: "ET - TAVUK" },
+    { id: 1002, name: "ET DÖNER PORSİYON (100 GRAM)", price: 185.00, category: "ET - TAVUK" },
+    { id: 1003, name: "YAPRAK DÖNER PORSİYON (100 GRAM)", price: 150.00, category: "ET - TAVUK" },
+    { id: 1004, name: "TAVUK DÖNER PORSİYON (100gr)", price: 150.00, category: "ET - TAVUK" },
+    { id: 1005, name: "KÖFTE PORSİYON (120 gr 6 adet) SERVİSLİ", price: 150.00, category: "ET - TAVUK" },
+    { id: 1006, name: "ET İSKENDER (110 gr)", price: 275.00, category: "ET - TAVUK" },
+    { id: 1007, name: "TAVUK İSKENDER (110 gr)", price: 200.00, category: "ET - TAVUK" },
+    { id: 1008, name: "ET DÖNER - KG", price: 1300.00, category: "ET - TAVUK" },
+    { id: 1009, name: "ET DÖNER - 500 GR", price: 650.00, category: "ET - TAVUK" },
+    { id: 1010, name: "TAVUK DÖNER - KG", price: 800.00, category: "ET - TAVUK" },
+    { id: 1011, name: "TAVUK DÖNER - 500 GR", price: 400.00, category: "ET - TAVUK" },
+    { id: 1012, name: "KUZU ŞİŞ (100 gr.) SERVİSLİ", price: 150.00, category: "ET - TAVUK" },
+    { id: 1013, name: "ADANA ŞİŞ (100 gr.)", price: 150.00, category: "ET - TAVUK" },
+    { id: 1014, name: "PİRZOLA - 4 ADET", price: 250.00, category: "ET - TAVUK" },
+    { id: 1015, name: "TAVUK FAJİTA", price: 200.00, category: "ET - TAVUK" },
+    { id: 1016, name: "ÇITIR PİRZOLA (KELEBEK) KG PİŞMİŞ SERVİSLİ", price: 350.00, category: "ET - TAVUK" },
+    { id: 1017, name: "KANAT IZGARA KG PİŞMİŞ SERVİSLİ", price: 550.00, category: "ET - TAVUK" },
+    { id: 1018, name: "TAVUK PİRZOLA KG PİŞMİŞ SERVİSLİ", price: 530.00, category: "ET - TAVUK" },
+    { id: 1019, name: "CİĞER ŞİŞ (100 gr.) SERVİSLİ", price: 80.00, category: "ET - TAVUK" },
+    { id: 1020, name: "TAVUK ŞİŞ (100 gr.) SERVİSLİ", price: 90.00, category: "ET - TAVUK" },
 
+    // ATIŞTIRMALIK Kategorisi (ID'ler 2000'den başlasın)
+    { id: 2001, name: "EKMEK ARASI ET DÖNER (80 GR)", price: 160.00, category: "ATIŞTIRMALIK" },
+    { id: 2002, name: "EKMEK ARASI KÖFTE (100 gr 5 adet)", price: 130.00, category: "ATIŞTIRMALIK" },
+    { id: 2003, name: "TAVUK DÖNER EKMEK ARASI (80 gr)", price: 130.00, category: "ATIŞTIRMALIK" },
+    { id: 2004, name: "PİZZA KARIŞIK (ORTA BOY)", price: 150.00, category: "ATIŞTIRMALIK" },
+    { id: 2005, name: "PİZZA KARIŞIK (BÜYÜK BOY)", price: 200.00, category: "ATIŞTIRMALIK" },
+    { id: 2006, name: "LAHMACUN", price: 75.00, category: "ATIŞTIRMALIK" },
+    { id: 2007, name: "PİDE ÇEŞİTLERİ", price: 100.00, category: "ATIŞTIRMALIK" },
+    { id: 2008, name: "AYVALIK TOSTU", price: 100.00, category: "ATIŞTIRMALIK" },
+    { id: 2009, name: "HAMBURGER", price: 120.00, category: "ATIŞTIRMALIK" },
+    { id: 2010, name: "ÇİĞ KÖFTE KG (MARUL-LİMON)", price: 300.00, category: "ATIŞTIRMALIK" },
+    { id: 2011, name: "KUMRU", price: 80.00, category: "ATIŞTIRMALIK" }, 
 
-    // EKMEK ARASI Kategorisi
-    { id: 2001, name: "EKMEK ARASI ET DÖNER (80 GR)", price: 160.00, category: "EKMEK ARASI" },
-    { id: 2002, name: "EKMEK ARASI YAPRAK DÖNER (80 GRAM)", price: 120.00, category: "EKMEK ARASI" }, 
-    { id: 2003, name: "TAVUK DÖNER EKMEK ARASI (80 gr)", price: 130.00, category: "EKMEK ARASI" },
-    { id: 2004, name: "EKMEK ARASI KÖFTE (100 gr 5 adet)", price: 130.00, category: "EKMEK ARASI" },
+    // İÇECEK Kategorisi (ID'ler 3000'den başlasın)
+    { id: 3001, name: "OSMANLI ŞERBETİ - 1 LİTRE", price: 75.00, category: "İÇECEK" },
+    { id: 3002, name: "LİMONATA", price: 75.00, category: "İÇECEK" },
+    { id: 3003, name: "SU", price: 10.00, category: "İÇECEK" },
+    { id: 3004, name: "AYRAN", price: 15.00, category: "İÇECEK" },
+    { id: 3005, name: "ÇAY", price: 10.00, category: "İÇECEK" },
+    { id: 3006, name: "GAZOZ", price: 25.00, category: "İÇECEK" },
+    { id: 3007, name: "SADE MADEN SUYU", price: 10.00, category: "İÇECEK" },
+    { id: 3008, name: "MEYVELİ MADEN SUYU", price: 15.00, category: "İÇECEK" },
+    { id: 3009, name: "KUTU İÇECEKLER", price: 30.00, category: "İÇECEK" }, 
 
-    // TOST&HAMBURGER Kategorisi
-    { id: 3001, name: "AYVALIK TOSTU", price: 80.00, category: "TOST&HAMBURGER" },
-    { id: 3002, name: "KUMRU", price: 80.00, category: "TOST&HAMBURGER" },
-    { id: 3003, name: "HAMBURGER", price: 100.00, category: "TOST&HAMBURGER" },
+    // TATLI Kategorisi (ID'ler 4000'den başlasın)
+    { id: 4001, name: "EV BAKLAVASI - KG", price: 400.00, category: "TATLI" },
+    { id: 4002, name: "EV BAKLAVASI - 500 GRAM", price: 200.00, category: "TATLI" },
+    { id: 4003, name: "EV BAKLAVASI - PORSİYON", price: 75.00, category: "TATLI" },
+    { id: 4004, name: "AŞURE - 500 GRAM", price: 100.00, category: "TATLI" },
+    { id: 4005, name: "HÖŞMERİM - 500 GRAM", price: 100.00, category: "TATLI" },
+    { id: 4006, name: "DİĞER PASTA ÇEŞİTLERİ", price: 50.00, category: "TATLI" },
+    { id: 4007, name: "YAĞLI GÖZLEME", price: 50.00, category: "TATLI" },
+    { id: 4008, name: "İÇLİ GÖZLEME", price: 60.00, category: "TATLI" },
+    { id: 4009, name: "TRİLEÇE DİLİM", price: 70.00, category: "TATLI" },
+    { id: 4010, name: "KABAK TATLISI KG.", price: 90.00, category: "TATLI" },
+    { id: 4011, name: "AŞURE - KG", price: 125.00, category: "TATLI" }, 
+    { id: 4012, name: "HÖŞMERİM - KG", price: 110.00, category: "TATLI" }, 
 
-     // İÇECEK Kategorisi
-    { id: 4001, name: "OSMANLI ŞERBETİ - 1.5 LİTRE", price: 30.00, category: "İÇECEK" },
-    { id: 4002, name: "SU", price: 10.00, category: "İÇECEK" },
-    { id: 4003, name: "KUTU İÇECEKLER", price: 30.00, category: "İÇECEK" }, 
-    { id: 4004, name: "AYRAN", price: 15.00, category: "İÇECEK" }, 
-    { id: 4005, name: "ÇAY", price: 10.00, category: "İÇECEK" }, 
-    { id: 4006, name: "SADE MADEN SUYU", price: 10.00, category: "İÇECEK" }, 
-    { id: 4007, name: "MEYVELİ MADEN SUYU", price: 15.00, category: "İÇECEK" }, 
-
-    // TATLI Kategorisi
-    { id: 5001, name: "EV BAKLAVASI - KG", price: 400.00, category: "TATLI" },
-    { id: 5002, name: "EV BAKLAVASI - 500 GRAM", price: 175.00, category: "TATLI" }, 
-    { id: 5003, name: "AŞURE - KG", price: 125.00, category: "TATLI" },
-    { id: 5004, name: "AŞURE - 500 GRAM", price: 75.00, category: "TATLI" }, 
-    { id: 5005, name: "HÖŞMERİM - KG", price: 110.00, category: "TATLI" },
-    { id: 5006, name: "HÖŞMERİM - 500 GRAM", price: 50.00, category: "TATLI" }, 
-    { id: 5007, name: "YAĞLI GÖZLEME", price: 60.00, category: "TATLI" }, 
-    { id: 5008, name: "İÇLİ GÖZLEME", price: 35.00, category: "TATLI" }, 
-    { id: 5009, name: "LAHMACUN", price: 75.00, category: "TATLI" }, 
-    { id: 5010, name: "CHEESE KEK - DİLİM", price: 40.00, category: "TATLI" }, 
-    { id: 5011, name: "TRİLEÇE DİLİM", price: 70.00, category: "TATLI" }, 
-    { id: 5012, name: "COCO STAR - DİLİM", price: 40.00, category: "TATLI" }, 
-    { id: 5013, name: "YAŞ PASTA (DİLİM 100 gr)", price: 50.00, category: "TATLI" },
-    { id: 5014, name: "KABAK TATLISI KG.", price: 90.00, category: "TATLI" },
-    { id: 5015, name: "DİĞER PASTA ÇEŞİTLERİ", price: 35.00, category: "TATLI" }, 
-
-     // ÇORBA Kategorisi
-     { id: 6001, name: "KELLE PAÇA ÇORBA", price: 60.00, category: "ÇORBA" },
-
-     // DİĞER Kategorisi
-     { id: 7001, name: "PİŞMEMİŞ KASAP KÖFTE", price: 620.00, category: "DİĞER" },
-     { id: 7002, name: "PİŞMEMİŞ İNEGÖL KÖFTE", price: 620.00, category: "DİĞER" },
-     { id: 7003, name: "BÜYÜKBAŞ DANA KIYMA KG", price: 650.00, category: "DİĞER" },
-     { id: 7004, name: "BÜYÜKBAŞ DANA KUŞBAŞI", price: 680.00, category: "DİĞER" },
-     { id: 7005, name: "ÇİĞ KÖFTE KG (MARUL-LİMON)", price: 300.00, category: "DİĞER" },
-     { id: 7006, name: "PİZZA KARIŞIK (KÜÇÜK BOY)", price: 125.00, category: "DİĞER" },
-     { id: 7007, name: "MANTI (KIYMALI)", price: 150.00, category: "DİĞER" },
-     { id: 7008, name: "MANTI (MERCİMEKLİ)", price: 100.00, category: "DİĞER" },
-     { id: 7009, name: "SARMA (ZEYTİNYAĞLI) KG.", price: 270.00, category: "DİĞER" },
+    // ÇORBA Kategorisi (ID'ler 5000'den başlasın)
+    { id: 5001, name: "KELLE PAÇA ÇORBA", price: 60.00, category: "ÇORBA" },
+    { id: 5002, name: "TARHANA ÇORBA", price: 60.00, category: "ÇORBA" },
+    
+    // DİĞER Kategorisi (ID'ler 6000'den başlasın)
+    { id: 6001, name: "PİŞMEMİŞ KASAP KÖFTE", price: 620.00, category: "DİĞER" },
+    { id: 6002, name: "PİŞMEMİŞ İNEGÖL KÖFTE", price: 620.00, category: "DİĞER" },
+    { id: 6003, name: "BÜYÜKBAŞ DANA KIYMA KG", price: 650.00, category: "DİĞER" },
+    { id: 6004, name: "BÜYÜKBAŞ DANA KUŞBAŞI", price: 680.00, category: "DİĞER" },
+    { id: 6005, name: "MANTI (KIYMALI)", price: 150.00, category: "DİĞER" },
+    { id: 6006, name: "MANTI (MERCİMEKLİ)", price: 100.00, category: "DİĞER" },
+    { id: 6007, name: "SARMA (ZEYTİNYAĞLI) KG.", price: 270.00, category: "DİĞER" }
 ];
+// *** ÜRÜN LİSTESİ SONU ***
 
 let tables = []; 
 let completedOrders = []; 
@@ -337,7 +341,6 @@ wss.on('connection', (ws) => {
                 }
                 break;
 
-            // YENİ: Hızlı Satış Tamamlama
             case 'complete_quick_sale':
                 if (!currentUserInfo) {
                     ws.send(JSON.stringify({ type: 'error', payload: { message: 'İşlem için giriş yapmalısınız.' } }));
@@ -351,23 +354,20 @@ wss.on('connection', (ws) => {
                     const quickSaleTimestamp = Date.now();
                     payload.items.forEach(item => {
                         completedOrders.push({
-                            // productId ve priceAtOrder istemciden geliyor
-                            productId: item.productId, // Ürün listesindeki ID (manuel değilse)
-                            name: item.name, // Ürün adı (fişte göstermek için)
+                            productId: item.productId, 
+                            name: item.name, 
                             quantity: item.quantity,
                             priceAtOrder: item.priceAtOrder,
                             description: item.description || '',
-                            category: item.category || 'Hızlı Satış', // Kategori bilgisi eklenebilir
-                            waiterUsername: payload.cashierUsername, // Satışı yapan kasa
-                            timestamp: item.timestamp || quickSaleTimestamp, // Her bir ürünün eklenme zamanı veya genel satış zamanı
-                            tableName: 'Hızlı Satış', // Satış tipini belirt
+                            category: products.find(p => p.id === item.productId)?.category || 'Hızlı Satış', // Ürünün kategorisini bul veya varsayılan ata
+                            waiterUsername: payload.cashierUsername, 
+                            timestamp: item.timestamp || quickSaleTimestamp, 
+                            tableName: 'Hızlı Satış', 
                             closingTimestamp: quickSaleTimestamp 
                         });
                     });
                     console.log(`${currentUserInfo.username} tarafından hızlı satış tamamlandı ve raporlandı.`);
                     ws.send(JSON.stringify({ type: 'quick_sale_success', payload: { message: 'Hızlı satış tamamlandı.'} }));
-                    // Satış raporunu isteyen kasaya güncel raporu gönder (opsiyonel, istemci zaten yenileyebilir)
-                    // ws.send(JSON.stringify({ type: 'sales_report_data', payload: { sales: completedOrders } }));
                 } else {
                     ws.send(JSON.stringify({ type: 'quick_sale_fail', payload: { error: 'Hızlı satış için ürün bulunamadı.' } }));
                 }
@@ -381,7 +381,7 @@ wss.on('connection', (ws) => {
                 }
                 const tableToRemoveFrom = tables.find(t => t.id === payload.tableId);
                 if (tableToRemoveFrom) {
-                    const productIdNum = payload.productId === null ? null : parseInt(payload.productId, 10);
+                    const productIdNum = payload.productId === null || payload.productId === 'manual' ? null : parseInt(payload.productId, 10);
 
                     const itemIndex = tableToRemoveFrom.order.findIndex(item => 
                         ( (productIdNum !== null && item.productId === productIdNum) || (productIdNum === null && item.name === payload.name) ) && 
