@@ -28,7 +28,7 @@ app.get('/', (req, res) => {
     });
 });
 
-// YENİ: /menu isteği geldiğinde menu.html dosyasını gönder
+// /menu isteği geldiğinde menu.html dosyasını gönder
 app.get('/menu', (req, res) => {
     const menuFilePath = path.join(__dirname, 'public', 'menu.html');
     console.log(`Serving menu file: ${menuFilePath}`); 
@@ -58,7 +58,6 @@ let users = [
     { id: 5, username: 'ayse', password: 'ayse1', role: 'waiter' },
 ];
 
-// *** GÜNCELLENMİŞ ÜRÜN LİSTESİ ***
 let products = [ 
     // ET Kategorisi
     { id: 1001, name: "TAVUK (PİLİÇ) ÇEVİRME KG", price: 250.00, category: "ET" },
@@ -131,7 +130,6 @@ let products = [
      { id: 7008, name: "MANTI (MERCİMEKLİ)", price: 100.00, category: "DİĞER" },
      { id: 7009, name: "SARMA (ZEYTİNYAĞLI) KG.", price: 270.00, category: "DİĞER" },
 ];
-// *** ÜRÜN LİSTESİ SONU ***
 
 let tables = []; 
 let completedOrders = []; 
@@ -336,6 +334,42 @@ wss.on('connection', (ws) => {
                     broadcastTableUpdates();
                 } else {
                      ws.send(JSON.stringify({ type: 'manual_order_update_fail', payload: { error: 'Geçersiz masa veya manuel ürün bilgileri.' } }));
+                }
+                break;
+
+            // YENİ: Hızlı Satış Tamamlama
+            case 'complete_quick_sale':
+                if (!currentUserInfo) {
+                    ws.send(JSON.stringify({ type: 'error', payload: { message: 'İşlem için giriş yapmalısınız.' } }));
+                    return;
+                }
+                if (currentUserInfo.role !== 'cashier') {
+                    ws.send(JSON.stringify({ type: 'error', payload: { message: 'Hızlı satış yapma yetkiniz yok.' } }));
+                    return;
+                }
+                if (payload && payload.items && Array.isArray(payload.items) && payload.items.length > 0) {
+                    const quickSaleTimestamp = Date.now();
+                    payload.items.forEach(item => {
+                        completedOrders.push({
+                            // productId ve priceAtOrder istemciden geliyor
+                            productId: item.productId, // Ürün listesindeki ID (manuel değilse)
+                            name: item.name, // Ürün adı (fişte göstermek için)
+                            quantity: item.quantity,
+                            priceAtOrder: item.priceAtOrder,
+                            description: item.description || '',
+                            category: item.category || 'Hızlı Satış', // Kategori bilgisi eklenebilir
+                            waiterUsername: payload.cashierUsername, // Satışı yapan kasa
+                            timestamp: item.timestamp || quickSaleTimestamp, // Her bir ürünün eklenme zamanı veya genel satış zamanı
+                            tableName: 'Hızlı Satış', // Satış tipini belirt
+                            closingTimestamp: quickSaleTimestamp 
+                        });
+                    });
+                    console.log(`${currentUserInfo.username} tarafından hızlı satış tamamlandı ve raporlandı.`);
+                    ws.send(JSON.stringify({ type: 'quick_sale_success', payload: { message: 'Hızlı satış tamamlandı.'} }));
+                    // Satış raporunu isteyen kasaya güncel raporu gönder (opsiyonel, istemci zaten yenileyebilir)
+                    // ws.send(JSON.stringify({ type: 'sales_report_data', payload: { sales: completedOrders } }));
+                } else {
+                    ws.send(JSON.stringify({ type: 'quick_sale_fail', payload: { error: 'Hızlı satış için ürün bulunamadı.' } }));
                 }
                 break;
 
