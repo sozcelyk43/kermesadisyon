@@ -193,7 +193,7 @@
              #orderPageContainer header, 
              #quickSaleModal header {
              }
-             #quickSaleButtonContainerTop, /* Hızlı satış ana butonu yazdırmada gizli */
+             #quickSaleButtonContainerTop, 
              #salesReportButton { 
                 display: none !important;
              }
@@ -286,10 +286,9 @@
                 <section id="tablesSection" class="mb-8">
                     <div class="flex justify-between items-center mb-4">
                         <h2 class="text-2xl font-semibold text-gray-700">Masalar</h2>
-                        
                     </div>
                     <div id="quickSaleButtonContainerTop" class="mb-6 hidden"> 
-                        <button id="quickSaleEntryButton" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-lg shadow-md text-lg transition duration-150">
+                        <button id="quickSaleEntryButton" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-6 px-6 rounded-xl shadow-lg text-2xl transition duration-150 transform hover:scale-105">
                             HIZLI SATIŞ
                         </button>
                     </div>
@@ -527,7 +526,7 @@
     const logoutButton = document.getElementById('logoutButton');
     const salesReportButton = document.getElementById('salesReportButton'); 
     const quickSaleEntryButton = document.getElementById('quickSaleEntryButton'); 
-    const quickSaleButtonContainerTop = document.getElementById('quickSaleButtonContainerTop'); // Hızlı satış butonunun kapsayıcısı
+    const quickSaleButtonContainerTop = document.getElementById('quickSaleButtonContainerTop'); 
     const tablesGrid = document.getElementById('tablesGrid');
     const productsListRef = document.getElementById('productsListRef');
     
@@ -824,11 +823,11 @@
         if (appState.user.role === 'cashier') {
             manualProductSection.classList.remove('hidden');
             salesReportButton.classList.remove('hidden'); 
-            quickSaleButtonContainerTop.classList.remove('hidden'); // Hızlı satış butonunun kapsayıcısını göster
+            quickSaleButtonContainerTop.classList.remove('hidden'); 
         } else {
             manualProductSection.classList.add('hidden');
             salesReportButton.classList.add('hidden'); 
-            quickSaleButtonContainerTop.classList.add('hidden'); // Hızlı satış butonunun kapsayıcısını gizle
+            quickSaleButtonContainerTop.classList.add('hidden'); 
         }
     }
     
