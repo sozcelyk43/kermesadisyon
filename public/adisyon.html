@@ -48,7 +48,7 @@
         .product-card-quantity input {
             width: 40px; 
             text-align: center;
-            border: 1px solid #d1d5db; 
+            border: 1px solid #d1d5db; /* Tailwind gray-300 */
             padding-top: 0.1rem;
             padding-bottom: 0.1rem;
         }
@@ -61,24 +61,24 @@
          }
 
         /* Kategori Alanı Renkleri */
-        .category-section-bg-ET { background-color: #fee2e2; } 
-        .category-section-bg-EKMEK-ARASI { background-color: #ffedd5; } 
-        .category-section-bg-TATLI { background-color: #fce7f3; } 
-        .category-section-bg-İÇECEK { background-color: #eff6ff; } 
-        .category-section-bg-TOSTHAMBURGER { background-color: #f3e8ff; } 
-        .category-section-bg-ÇORBA { background-color: #fef9c3; } 
-        .category-section-bg-DİĞER { background-color: #dcfce7; } 
-        .category-section-bg-default { background-color: #f3f4f6; } 
+        .category-section-bg-ET { background-color: #fee2e2; } /* red-100 */
+        .category-section-bg-EKMEK-ARASI { background-color: #ffedd5; } /* orange-100 */
+        .category-section-bg-TATLI { background-color: #fce7f3; } /* pink-100 */
+        .category-section-bg-İÇECEK { background-color: #eff6ff; } /* blue-100 */
+        .category-section-bg-TOSTHAMBURGER { background-color: #f3e8ff; } /* purple-100 */
+        .category-section-bg-ÇORBA { background-color: #fef9c3; } /* yellow-100 */
+        .category-section-bg-DİĞER { background-color: #dcfce7; } /* green-100 */
+        .category-section-bg-default { background-color: #f3f4f6; } /* gray-100 */
 
-        /* Ürün Kartı Renkleri */
-        .product-card-bg-ET { background-color: #fecaca; } 
-        .product-card-bg-EKMEK-ARASI { background-color: #fed7aa; } 
-        .product-card-bg-TATLI { background-color: #fbcfe8; } 
-        .product-card-bg-İÇECEK { background-color: #dbeafe; } 
-        .product-card-bg-TOSTHAMBURGER { background-color: #e9d5ff; } 
-        .product-card-bg-ÇORBA { background-color: #fef08a; } 
-        .product-card-bg-DİĞER { background-color: #bbf7d0; } 
-        .product-card-bg-default { background-color: #e5e7eb; } 
+        /* Ürün Kartı Renkleri (Kategorinin daha koyu tonu) */
+        .product-card-bg-ET { background-color: #fecaca; } /* red-200 */
+        .product-card-bg-EKMEK-ARASI { background-color: #fed7aa; } /* orange-200 */
+        .product-card-bg-TATLI { background-color: #fbcfe8; } /* pink-200 */
+        .product-card-bg-İÇECEK { background-color: #dbeafe; } /* blue-200 */
+        .product-card-bg-TOSTHAMBURGER { background-color: #e9d5ff; } /* purple-200 */
+        .product-card-bg-ÇORBA { background-color: #fef08a; } /* yellow-200 */
+        .product-card-bg-DİĞER { background-color: #bbf7d0; } /* green-200 */
+        .product-card-bg-default { background-color: #e5e7eb; } /* gray-200 */
 
 
         /* Ürün Kartı Görünümü */
@@ -90,10 +90,10 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between; 
-            min-height: 120px; /* Hızlı satış için daha kompakt */
+            min-height: 120px; 
         }
-         .product-card.quick-sale-card { /* Hızlı satış kartları için özel stil */
-            min-height: 100px; /* Daha da kompakt */
+         .product-card.quick-sale-card { 
+            min-height: 110px; /* Hızlı satış için daha da kompakt */
             padding: 0.5rem;
         }
         .product-card:hover {
@@ -105,10 +105,17 @@
              margin-bottom: 0.25rem;
              font-size: 0.875rem; 
         }
-         .product-card.quick-sale-card h5 { /* Hızlı satış ürün adı */
-             font-size: 1rem; /* Biraz daha büyük */
+         .product-card.quick-sale-card h5 { 
+             font-size: 0.8rem; /* Hızlı satışta ürün adı biraz daha küçük */
              text-align: center;
-             margin-bottom: 0.5rem;
+             margin-bottom: 0.3rem;
+             line-height: 1.2; /* Satır yüksekliği */
+             min-height: 2.4em; /* İki satırlık yer ayır */
+             display: -webkit-box;
+            -webkit-line-clamp: 2; /* İki satırda kes */
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
          }
          .product-card p.product-price { 
              color: #4b5563; 
@@ -126,7 +133,7 @@
          .product-card.quick-sale-card .add-item-from-card-btn {
              padding-top: 0.5rem;
              padding-bottom: 0.5rem;
-             font-size: 0.875rem; /* Ekle butonu yazısı */
+             font-size: 0.875rem; 
          }
 
 
@@ -807,8 +814,8 @@
     let initialDataRendered = false;
     function renderInitialDataIfNeeded() {
         if (!initialDataRendered) {
-            renderProductGrid(orderPageProductGrid, false); // Normal sipariş için ürün gridi
-            renderProductGrid(quickSaleProductGrid, true); // Hızlı satış için ürün gridi
+            renderProductGrid(orderPageProductGrid, false); 
+            renderProductGrid(quickSaleProductGrid, true); 
             renderProductsForReference();
             populateManualCategorySelect(); 
             initialDataRendered = true;
@@ -903,8 +910,8 @@
             categorySection.appendChild(categoryTitle);
 
             const productGrid = document.createElement('div');
-            // Hızlı satış için 3 sütun, normal sipariş için 2 (mobil) / 3 (tablet+)
-            productGrid.className = forQuickSale ? 'grid grid-cols-3 gap-2' : 'grid grid-cols-2 md:grid-cols-3 gap-3'; 
+            // **DEĞİŞİKLİK:** Hızlı satış için 4 sütun, normal sipariş için mobil 2, tablet+ 3 sütun
+            productGrid.className = forQuickSale ? 'grid grid-cols-3 sm:grid-cols-4 gap-2' : 'grid grid-cols-2 md:grid-cols-3 gap-3'; 
 
             categories[category].sort((a, b) => a.name.localeCompare(b, 'tr')).forEach(product => {
                 const card = document.createElement('div');
@@ -914,7 +921,7 @@
 
                 if (forQuickSale) {
                     card.innerHTML = `
-                        <h5 class="font-semibold text-sm text-gray-800 text-center">${product.name}</h5>
+                        <h5 class="font-semibold text-gray-800 text-center">${product.name}</h5>
                         <div class="product-card-quantity flex items-center justify-center space-x-1 my-1">
                             <button class="quantity-decrease bg-red-200 hover:bg-red-300 text-red-700 font-bold rounded text-xs">-</button>
                             <input type="number" value="1" min="1" class="quantity-input border border-gray-300 rounded text-xs p-1">
@@ -956,7 +963,7 @@
             const decreaseBtn = card.querySelector('.quantity-decrease');
             const increaseBtn = card.querySelector('.quantity-increase');
             const addBtn = card.querySelector('.add-item-from-card-btn');
-            const descriptionInput = forQuickSale ? null : card.querySelector('.description-input'); // Hızlı satışta açıklama yok
+            const descriptionInput = forQuickSale ? null : card.querySelector('.description-input'); 
             const productId = card.dataset.productId;
 
             decreaseBtn.addEventListener('click', () => {
@@ -971,7 +978,7 @@
             });
 
             addBtn.addEventListener('click', () => {
-                const descValue = forQuickSale ? '' : descriptionInput.value.trim();
+                const descValue = forQuickSale ? '' : (descriptionInput ? descriptionInput.value.trim() : '');
                 if (forQuickSale) {
                     addProductToQuickSale(productId, parseInt(quantityInput.value), descValue);
                 } else {
@@ -1008,7 +1015,7 @@
         }
         const existingItem = appState.currentQuickSaleOrder.find(item => 
             item.productId === parseInt(productId) && 
-            item.description === description // Hızlı satışta açıklama olmayacak ama yine de kontrol edelim
+            item.description === description 
         );
         if (existingItem) {
             existingItem.quantity += quantity;
@@ -1018,7 +1025,7 @@
                 name: product.name, 
                 priceAtOrder: product.price,
                 quantity: quantity,
-                description: description, // Hızlı satışta boş olacak
+                description: description, 
                 waiterUsername: appState.user.username, 
                 timestamp: Date.now()
             });
@@ -1368,7 +1375,7 @@
             renderProductGrid(quickSaleProductGrid, true); 
             quickSaleModal.classList.add('active');
             appContainer.classList.add('hidden'); 
-            orderPageContainer.classList.remove('active'); // Normal sipariş sayfasını gizle
+            orderPageContainer.classList.remove('active'); 
         } else {
             alert("Bu özelliği kullanma yetkiniz yok.");
         }
@@ -1421,7 +1428,7 @@
             }
             
             let itemWaiterHTML = ''; 
-            if (item.waiterUsername && tableName !== "Hızlı Satış") { // Hızlı satışta kalem bazında garson gösterme
+            if (item.waiterUsername && tableName !== "Hızlı Satış") { 
                  itemWaiterHTML = `<span class="item-waiter">Ekleyen: ${item.waiterUsername} (${formatTimestamp(item.timestamp)})</span>`; 
             }
 
@@ -1467,11 +1474,7 @@
              console.log("Garson fiş modalını kapattı, masa açık kalacak.");
         }
         receiptModal.classList.remove('active');
-        // Eğer bir masa seçiliyse ve kapatılmadıysa (garson tarafından) sipariş ekranına dön
-        // Kasa ise veya masa kapatıldıysa veya hızlı satış fişiyse masalar ekranına dön
         if (appState.currentTableId && !(appState.user && appState.user.role === 'cashier')) {
-            // Garson ise ve masa açıksa, sipariş ekranında kalabilir veya masalara dönebilir.
-            // Şimdilik masalara dönmesini sağlayalım.
             showTablesView();
         } else {
             showTablesView(); 
