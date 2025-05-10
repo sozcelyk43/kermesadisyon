@@ -176,7 +176,7 @@ function broadcastTableUpdates() {
     broadcast({ type: 'tables_update', payload: { tables: tables } });
 }
 
-// YENİ: Tüm bağlı istemcilere güncellenmiş ürün listesini gönderir
+// Tüm bağlı istemcilere güncellenmiş ürün listesini gönderir
 function broadcastProductsUpdate() {
     broadcast({ type: 'products_update', payload: { products: products } });
 }
@@ -225,7 +225,7 @@ wss.on('connection', (ws) => {
                         payload: {
                             user: { id: user.id, username: user.username, role: user.role }, 
                             tables: tables, 
-                            products: products // Girişte ürün listesini de gönder
+                            products: products 
                         }
                     }));
                     console.log(`Kullanıcı giriş yaptı: ${user.username} (Rol: ${user.role})`);
@@ -249,7 +249,6 @@ wss.on('connection', (ws) => {
                          clients.set(ws, payload.user); 
                          currentUserInfo = payload.user; 
                          console.log(`Kullanıcı oturumu sürdürdü: ${currentUserInfo.username}`);
-                         // Oturum sürdürüldükten sonra güncel masa ve ürün verilerini gönder
                          ws.send(JSON.stringify({ type: 'tables_update', payload: { tables: tables } }));
                          ws.send(JSON.stringify({ type: 'products_update', payload: { products: products } }));
                      } else {
@@ -314,7 +313,7 @@ wss.on('connection', (ws) => {
                 }
                 break;
 
-            case 'add_manual_order_item': // Bu, masanın siparişine özel ürün ekler, ana menüyü DEĞİŞTİRMEZ.
+            case 'add_manual_order_item': 
                  if (!currentUserInfo) { 
                     ws.send(JSON.stringify({ type: 'error', payload: { message: 'İşlem için giriş yapmalısınız.' } }));
                     return;
@@ -327,6 +326,10 @@ wss.on('connection', (ws) => {
                 const tableForManual = tables.find(t => t.id === payload.tableId);
                 
                 if (tableForManual && payload.name && payload.price >= 0 && payload.quantity > 0) {
+                     // Ana menüye ekleme (isteğe bağlı, eğer bu formun amacı buysa)
+                     // Bu örnekte, sadece o anki siparişe özel bir ürün ekliyoruz.
+                     // Eğer ana menüye de eklenecekse, add_product_to_main_menu gibi ayrı bir mesaj tipi daha mantıklı olur.
+                     
                      tableForManual.order.push({
                          name: payload.name, 
                          quantity: payload.quantity,
@@ -341,6 +344,8 @@ wss.on('connection', (ws) => {
                     tableForManual.status = 'dolu';
                     tableForManual.waiterId = currentUserInfo.id; 
                     tableForManual.waiterUsername = currentUserInfo.username; 
+                    
+                    // Sadece table update gönder, order_update_success gereksiz ve istemcide uyarı veriyor.
                     broadcastTableUpdates();
                 } else {
                      ws.send(JSON.stringify({ type: 'manual_order_update_fail', payload: { error: 'Geçersiz masa veya manuel ürün bilgileri.' } }));
@@ -354,7 +359,10 @@ wss.on('connection', (ws) => {
                     return;
                 }
                 if (payload && payload.name && payload.price >= 0 && payload.category) {
-                    const newProductId = products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 7001; // Benzersiz ID oluştur
+                    // En yüksek ID'yi bul ve bir artır. Eğer ürün yoksa 7000'den başlat (veya daha uygun bir başlangıç)
+                    const maxId = products.reduce((max, p) => p.id > max ? p.id : max, 0);
+                    const newProductId = maxId < 7000 ? 7001 : maxId + 1;
+
                     const newProduct = {
                         id: newProductId,
                         name: payload.name.toUpperCase(),
@@ -362,9 +370,9 @@ wss.on('connection', (ws) => {
                         category: payload.category,
                     };
                     products.push(newProduct);
-                    console.log(`Yeni ürün menüye eklendi: ${newProduct.name}`);
+                    console.log(`Yeni ürün ana menüye eklendi: ${newProduct.name}`);
                     broadcastProductsUpdate(); // Tüm istemcilere güncel ürün listesini gönder
-                    ws.send(JSON.stringify({ type: 'main_menu_product_added', payload: { product: newProduct } })); // Başarı mesajı
+                    ws.send(JSON.stringify({ type: 'main_menu_product_added', payload: { product: newProduct, message: `${newProduct.name} menüye eklendi.` } })); 
                 } else {
                     ws.send(JSON.stringify({ type: 'error', payload: { message: 'Eksik ürün bilgisi.' } }));
                 }
