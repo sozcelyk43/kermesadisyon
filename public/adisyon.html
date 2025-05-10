@@ -61,22 +61,22 @@
          }
 
         /* Kategori Alanı Renkleri */
-        .category-section-bg-ET-TAVUK { background-color: #fee2e2; } 
-        .category-section-bg-ATIŞTIRMALIK { background-color: #ffedd5; } 
-        .category-section-bg-TATLI { background-color: #fce7f3; } 
-        .category-section-bg-İÇECEK { background-color: #eff6ff; } 
-        .category-section-bg-ÇORBA { background-color: #fef9c3; } 
-        .category-section-bg-DİĞER { background-color: #dcfce7; } 
-        .category-section-bg-default { background-color: #f3f4f6; } 
+        .category-section-bg-ET-TAVUK { background-color: #fee2e2; } /* red-100 */
+        .category-section-bg-ATIŞTIRMALIK { background-color: #ffedd5; } /* orange-100 */
+        .category-section-bg-TATLI { background-color: #fce7f3; } /* pink-100 */
+        .category-section-bg-İÇECEK { background-color: #eff6ff; } /* blue-100 */
+        .category-section-bg-ÇORBA { background-color: #fef9c3; } /* yellow-100 */
+        .category-section-bg-DİĞER { background-color: #dcfce7; } /* green-100 */
+        .category-section-bg-default { background-color: #f3f4f6; } /* gray-100 */
 
         /* Ürün Kartı Renkleri (Kategorinin daha koyu tonu) */
-        .product-card-bg-ET-TAVUK { background-color: #fecaca; } 
-        .product-card-bg-ATIŞTIRMALIK { background-color: #fed7aa; } 
-        .product-card-bg-TATLI { background-color: #fbcfe8; } 
-        .product-card-bg-İÇECEK { background-color: #dbeafe; } 
-        .product-card-bg-ÇORBA { background-color: #fef08a; } 
-        .product-card-bg-DİĞER { background-color: #bbf7d0; } 
-        .product-card-bg-default { background-color: #e5e7eb; } 
+        .product-card-bg-ET-TAVUK { background-color: #fecaca; } /* red-200 */
+        .product-card-bg-ATIŞTIRMALIK { background-color: #fed7aa; } /* orange-200 */
+        .product-card-bg-TATLI { background-color: #fbcfe8; } /* pink-200 */
+        .product-card-bg-İÇECEK { background-color: #dbeafe; } /* blue-200 */
+        .product-card-bg-ÇORBA { background-color: #fef08a; } /* yellow-200 */
+        .product-card-bg-DİĞER { background-color: #bbf7d0; } /* green-200 */
+        .product-card-bg-default { background-color: #e5e7eb; } /* gray-200 */
 
 
         /* Ürün Kartı Görünümü */
@@ -185,9 +185,9 @@
             #salesReportModalContent button,
             #quickSaleModal button:not(#printReceiptButton), 
             #appContainer button#logoutButton, 
-            #orderPageContainer button:not(#printReceiptButton):not(#closeReceiptModalButton):not(#finalizeAndCloseTableButton), 
+            #orderPageContainer button:not(#printReceiptButton):not(#closeReceiptModalOnlyButton):not(#finalizeAndCloseTableButton), 
             #confirmCloseTableModal button,
-            #confirmDiscountModal button /* İndirim onay modalı butonları */
+            #confirmDiscountModal button 
              {
                 display: none !important; 
             }
@@ -231,7 +231,7 @@
                 color: #555;
                 flex-basis: 100%; 
             }
-             #receiptModalContent .discount-info { /* İndirim bilgisi için stil */
+             #receiptModalContent .discount-info { 
                  font-weight: bold;
                  color: #dc2626; /* red-600 */
              }
@@ -385,7 +385,11 @@
                     <div id="quickSaleTotal" class="text-right font-bold text-xl mt-4 pt-2 border-t">
                         Toplam: 0 ₺
                     </div>
-                    <button id="completeQuickSaleButton" class="w-full mt-4 bg-green-600 hover:bg-green-700 text-white font-semibold p-3 rounded-md transition duration-150">Satışı Tamamla ve Fiş Kes</button>
+                    <div id="quickSaleDiscountInfo" class="text-right text-sm text-red-600 mt-1 hidden"></div>
+                    <div class="mt-4 space-y-2">
+                        <button id="applyQuickSaleDiscountButton" class="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-semibold p-2 rounded-md transition duration-150">Personel İndirimi (%30)</button>
+                        <button id="completeQuickSaleButton" class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold p-3 rounded-md transition duration-150">Satışı Tamamla ve Fiş Kes</button>
+                    </div>
                 </section>
             </div>
         </div>
@@ -555,8 +559,8 @@
         currentTableId: null, 
         salesReport: [],
         currentQuickSaleOrder: [],
-        discountApplied: false, // YENİ: İndirim uygulandı mı?
-        discountedTotal: 0 // YENİ: İndirimli toplam
+        currentOrderOriginalTotal: 0, 
+        currentOrderDiscountAmount: 0 
     };
 
     // --- DOM Elementleri ---
@@ -584,8 +588,8 @@
     const orderPageProductGrid = document.getElementById('orderPageProductGrid'); 
     const orderPageCurrentOrderItems = document.getElementById('orderPageCurrentOrderItems');
     const orderPageCurrentOrderTotal = document.getElementById('orderPageCurrentOrderTotal');
-    const discountInfoDiv = document.getElementById('discountInfo'); // YENİ
-    const applyDiscountButton = document.getElementById('applyDiscountButton'); // YENİ
+    const discountInfoDiv = document.getElementById('discountInfo'); 
+    const applyDiscountButton = document.getElementById('applyDiscountButton'); 
     const showReceiptButton = document.getElementById('showReceiptButton'); 
     const finalizeAndCloseTableButton = document.getElementById('finalizeAndCloseTableButton'); 
 
@@ -603,6 +607,8 @@
     const quickSaleProductGrid = document.getElementById('quickSaleProductGrid');
     const quickSaleCurrentItems = document.getElementById('quickSaleCurrentItems');
     const quickSaleTotal = document.getElementById('quickSaleTotal');
+    const quickSaleDiscountInfo = document.getElementById('quickSaleDiscountInfo'); 
+    const applyQuickSaleDiscountButton = document.getElementById('applyQuickSaleDiscountButton'); 
     const completeQuickSaleButton = document.getElementById('completeQuickSaleButton');
 
 
@@ -611,10 +617,10 @@
     const receiptTableName = document.getElementById('receiptTableName');
     const receiptWaiterName = document.getElementById('receiptWaiterName');
     const receiptItems = document.getElementById('receiptItems');
-    const receiptDiscountInfo = document.getElementById('receiptDiscountInfo'); // YENİ
-    const receiptSubtotal = document.getElementById('receiptSubtotal'); // YENİ
-    const receiptDiscountAmount = document.getElementById('receiptDiscountAmount'); // YENİ
-    const receiptGrandTotal = document.getElementById('receiptGrandTotal'); // Eski receiptTotal -> receiptGrandTotal
+    const receiptDiscountInfo = document.getElementById('receiptDiscountInfo'); 
+    const receiptSubtotal = document.getElementById('receiptSubtotal'); 
+    const receiptDiscountAmount = document.getElementById('receiptDiscountAmount'); 
+    const receiptGrandTotal = document.getElementById('receiptGrandTotal'); 
     const printReceiptButton = document.getElementById('printReceiptButton');
     const closeReceiptModalOnlyButton = document.getElementById('closeReceiptModalOnlyButton'); 
 
@@ -890,14 +896,16 @@
             quickSaleButtonContainerTop.classList.remove('hidden'); 
             finalizeAndCloseTableButton.classList.remove('hidden'); 
             showReceiptButton.classList.remove('hidden'); 
-            applyDiscountButton.classList.remove('hidden'); // İndirim butonunu kasa için göster
+            applyDiscountButton.classList.remove('hidden'); 
+            applyQuickSaleDiscountButton.classList.remove('hidden'); 
         } else { 
             manualProductSection.classList.add('hidden');
             salesReportButton.classList.add('hidden'); 
             quickSaleButtonContainerTop.classList.add('hidden'); 
             finalizeAndCloseTableButton.classList.add('hidden'); 
             showReceiptButton.classList.add('hidden'); 
-            applyDiscountButton.classList.add('hidden'); // İndirim butonunu garson için gizle
+            applyDiscountButton.classList.add('hidden'); 
+            applyQuickSaleDiscountButton.classList.add('hidden');
         }
     }
     
@@ -1092,8 +1100,7 @@
             quantity: quantity,
             description: description 
         });
-        // İndirim uygulandıysa sıfırla
-        resetDiscount();
+        resetCurrentOrderDiscount(); 
     }
     
     // Hızlı satış sepetine ürün ekleme
@@ -1120,43 +1127,55 @@
                 timestamp: Date.now()
             });
         }
+        resetCurrentOrderDiscount(); 
         renderQuickSaleOrder();
     }
 
     // Hızlı satış sepetini render eder
     function renderQuickSaleOrder() {
         quickSaleCurrentItems.innerHTML = '';
-        let total = 0;
+        let originalTotal = 0;
         if (appState.currentQuickSaleOrder.length === 0) {
             quickSaleCurrentItems.innerHTML = '<p class="text-gray-500 text-center py-4">Sepet boş.</p>';
-            quickSaleTotal.textContent = 'Toplam: 0 ₺';
-            return;
+        } else {
+            appState.currentQuickSaleOrder.forEach((item, index) => {
+                const itemTotal = item.priceAtOrder * item.quantity;
+                originalTotal += itemTotal;
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'flex justify-between items-start p-2 bg-white rounded-md text-sm';
+                let descriptionHTML = item.description ? `<p class="text-xs text-gray-500"><em>${item.description}</em></p>` : '';
+                itemDiv.innerHTML = `
+                    <div>
+                        <span class="font-medium">${item.name}</span>
+                        <span class="text-xs text-gray-500"> (${item.quantity} x ${formatPrice(item.priceAtOrder)})</span>
+                        ${descriptionHTML}
+                    </div>
+                    <div class="flex items-center">
+                        <span class="font-semibold mr-2">${formatPrice(itemTotal)}</span>
+                        <button data-index="${index}" class="remove-item-quick-sale-btn text-red-500 hover:text-red-700 text-xs p-1">X</button>
+                    </div>
+                `;
+                quickSaleCurrentItems.appendChild(itemDiv);
+            });
         }
-        appState.currentQuickSaleOrder.forEach((item, index) => {
-            const itemTotal = item.priceAtOrder * item.quantity;
-            total += itemTotal;
-            const itemDiv = document.createElement('div');
-            itemDiv.className = 'flex justify-between items-start p-2 bg-white rounded-md text-sm';
-            let descriptionHTML = item.description ? `<p class="text-xs text-gray-500"><em>${item.description}</em></p>` : '';
-            itemDiv.innerHTML = `
-                <div>
-                    <span class="font-medium">${item.name}</span>
-                    <span class="text-xs text-gray-500"> (${item.quantity} x ${formatPrice(item.priceAtOrder)})</span>
-                    ${descriptionHTML}
-                </div>
-                <div class="flex items-center">
-                    <span class="font-semibold mr-2">${formatPrice(itemTotal)}</span>
-                    <button data-index="${index}" class="remove-item-quick-sale-btn text-red-500 hover:text-red-700 text-xs p-1">X</button>
-                </div>
-            `;
-            quickSaleCurrentItems.appendChild(itemDiv);
-        });
-        quickSaleTotal.textContent = `Toplam: ${formatPrice(total)}`;
+        
+        appState.currentOrderOriginalTotal = originalTotal; 
+        if (appState.currentOrderDiscountAmount > 0) {
+            const discounted = originalTotal - appState.currentOrderDiscountAmount;
+            quickSaleTotal.textContent = `Toplam: ${formatPrice(discounted)} (İndirimli)`;
+            quickSaleDiscountInfo.textContent = `İndirim Uygulandı: -${formatPrice(appState.currentOrderDiscountAmount)}`;
+            quickSaleDiscountInfo.classList.remove('hidden');
+        } else {
+            quickSaleTotal.textContent = `Toplam: ${formatPrice(originalTotal)}`;
+            quickSaleDiscountInfo.classList.add('hidden');
+        }
+
 
         document.querySelectorAll('.remove-item-quick-sale-btn').forEach(button => {
             button.addEventListener('click', (e) => {
                 const itemIndex = parseInt(e.target.dataset.index);
                 appState.currentQuickSaleOrder.splice(itemIndex, 1);
+                resetCurrentOrderDiscount(); 
                 renderQuickSaleOrder();
             });
         });
@@ -1215,7 +1234,6 @@
     // Sipariş sayfasındaki mevcut siparişleri render eder
     function renderOrderPageForTable(table) { 
         orderPageCurrentOrderItems.innerHTML = '';
-        resetDiscount(); // Her renderda indirimi sıfırla
         
         if (table.status === 'dolu' && table.waiterUsername) {
             orderPageWaiterInfo.textContent = `Bu Siparişi Alan Garson: ${table.waiterUsername}`;
@@ -1228,9 +1246,13 @@
 
         if (!table || !table.order || table.order.length === 0) {
             orderPageCurrentOrderItems.innerHTML = '<p class="text-gray-500 py-4">Sipariş boş.</p>';
-            orderPageCurrentOrderTotal.textContent = 'Toplam: 0 ₺';
+            appState.currentOrderOriginalTotal = 0; 
         } else {
+            let originalTotal = 0;
             table.order.forEach((item) => {
+                const itemTotal = (item.priceAtOrder || 0) * item.quantity;
+                originalTotal += itemTotal;
+
                 const orderItemDiv = document.createElement('div');
                 orderItemDiv.className = 'flex justify-between items-start p-3 bg-gray-50 rounded-md';
                 
@@ -1266,7 +1288,18 @@
                 `;
                 orderPageCurrentOrderItems.appendChild(orderItemDiv);
             });
-            orderPageCurrentOrderTotal.textContent = `Toplam: ${formatPrice(table.total)}`;
+            appState.currentOrderOriginalTotal = originalTotal; 
+        }
+        
+        // Toplamı ve indirim bilgisini güncelle
+        if (appState.currentOrderDiscountAmount > 0 && appState.currentOrderOriginalTotal > 0) {
+            const discounted = appState.currentOrderOriginalTotal - appState.currentOrderDiscountAmount;
+            orderPageCurrentOrderTotal.textContent = `Toplam: ${formatPrice(discounted)} (İndirimli)`;
+            discountInfoDiv.textContent = `İndirim Uygulandı: -${formatPrice(appState.currentOrderDiscountAmount)}`;
+            discountInfoDiv.classList.remove('hidden');
+        } else {
+            orderPageCurrentOrderTotal.textContent = `Toplam: ${formatPrice(appState.currentOrderOriginalTotal)}`;
+            discountInfoDiv.classList.add('hidden');
         }
         
         // Butonların görünürlüğünü rol bazlı ayarla
@@ -1389,7 +1422,7 @@
         orderPageContainer.classList.remove('active');
         quickSaleModal.classList.remove('active'); 
         appState.currentTableId = null;
-        resetDiscount(); // Masalar ekranına dönünce indirimi sıfırla
+        resetCurrentOrderDiscount(); 
     }
 
     function selectTableForOrder(tableId) {
@@ -1397,6 +1430,7 @@
         const table = appState.tables.find(t => t.id === tableId);
         if (table) {
             orderPageTableName.textContent = table.name;
+            resetCurrentOrderDiscount(); 
             renderOrderPageForTable(table); 
             updateUIForRole(); 
             appContainer.classList.add('hidden'); 
@@ -1434,7 +1468,7 @@
             quantity: quantity,
             description: description
         });
-        resetDiscount(); // Siparişe ürün eklenince indirimi sıfırla
+        resetCurrentOrderDiscount(); 
 
         manualProductName.value = '';
         manualProductCategory.value = ''; 
@@ -1454,7 +1488,7 @@
             name: productIdToRemove === 'manual' ? nameToRemove : null, 
             description: descriptionToRemove 
         });
-        resetDiscount(); // Siparişten ürün silinince indirimi sıfırla
+        resetCurrentOrderDiscount(); 
     }
 
     // Fiş modalını açar (Sadece Kasa için)
@@ -1464,7 +1498,8 @@
             alert("Masada fiş kesilecek sipariş bulunmuyor.");
             return;
         }
-        prepareAndShowReceipt(table.order, table.name, table.waiterUsername, table.total, appState.discountApplied ? appState.discountedTotal : null);
+        const finalTotal = appState.currentOrderDiscountAmount > 0 ? (appState.currentOrderOriginalTotal - appState.currentOrderDiscountAmount) : appState.currentOrderOriginalTotal;
+        prepareAndShowReceipt(table.order, table.name, table.waiterUsername, appState.currentOrderOriginalTotal, appState.currentOrderDiscountAmount > 0 ? finalTotal : null);
     }
 
     // Masayı kapatma fonksiyonu (Sadece Kasa için)
@@ -1476,25 +1511,49 @@
         }
     }
     
-    // YENİ: Personel İndirimi Uygulama Fonksiyonu
+    // Personel İndirimi Uygulama Fonksiyonu (Normal Siparişler için)
     function handleApplyDiscount() {
         if (appState.user && appState.user.role === 'cashier' && appState.currentTableId) {
-            confirmDiscountModal.classList.add('active');
+            const table = appState.tables.find(t => t.id === appState.currentTableId);
+            if (table && table.order.length > 0) {
+                appState.currentOrderOriginalTotal = table.total; 
+                confirmDiscountModal.classList.add('active');
+            } else {
+                alert("İndirim uygulanacak sipariş bulunmuyor.");
+            }
         } else {
             alert("İndirim uygulama yetkiniz yok.");
         }
     }
     
-    // YENİ: İndirimi sıfırlama fonksiyonu
-    function resetDiscount() {
-        appState.discountApplied = false;
-        appState.discountedTotal = 0;
+    // Personel İndirimi Uygulama Fonksiyonu (Hızlı Satış için)
+    function handleApplyQuickSaleDiscount() {
+        if (appState.user && appState.user.role === 'cashier') {
+            if (appState.currentQuickSaleOrder.length > 0) {
+                // Hızlı satış sepetinin orijinal toplamı renderQuickSaleOrder'da appState.currentOrderOriginalTotal'a atanmıştı.
+                confirmDiscountModal.classList.add('active');
+            } else {
+                alert("Hızlı satış sepetinde indirim uygulanacak ürün bulunmuyor.");
+            }
+        } else {
+            alert("İndirim uygulama yetkiniz yok.");
+        }
+    }
+
+    // İndirimi sıfırlama fonksiyonu
+    function resetCurrentOrderDiscount() {
+        appState.currentOrderDiscountAmount = 0;
         discountInfoDiv.classList.add('hidden');
         discountInfoDiv.textContent = '';
-        // Toplamı orijinal haline getir (eğer masa verisi varsa)
-        const table = appState.tables.find(t => t.id === appState.currentTableId);
-        if (table) {
-            orderPageCurrentOrderTotal.textContent = `Toplam: ${formatPrice(table.total)}`;
+        quickSaleDiscountInfo.classList.add('hidden');
+        quickSaleDiscountInfo.textContent = '';
+
+        if (orderPageContainer.classList.contains('active') && appState.currentTableId) {
+            const table = appState.tables.find(t => t.id === appState.currentTableId);
+            if (table) renderOrderPageForTable(table); 
+        }
+        if (quickSaleModal.classList.contains('active')) {
+            renderQuickSaleOrder(); 
         }
     }
 
@@ -1503,6 +1562,7 @@
     function openQuickSaleModal() {
         if (appState.user && appState.user.role === 'cashier') {
             appState.currentQuickSaleOrder = []; 
+            resetCurrentOrderDiscount(); 
             renderQuickSaleOrder(); 
             renderProductGrid(quickSaleProductGrid, true); 
             quickSaleModal.classList.add('active');
@@ -1524,9 +1584,8 @@
             items: appState.currentQuickSaleOrder,
             cashierUsername: appState.user.username 
         });
-        const quickSaleTotalAmount = appState.currentQuickSaleOrder.reduce((sum, item) => sum + (item.priceAtOrder * item.quantity), 0);
-        // Hızlı satışta personel indirimi uygulanmayacak, bu nedenle discountedTotal null gönderiliyor.
-        prepareAndShowReceipt(appState.currentQuickSaleOrder, "Hızlı Satış", appState.user.username, quickSaleTotalAmount, null);
+        const finalTotal = appState.currentOrderDiscountAmount > 0 ? (appState.currentOrderOriginalTotal - appState.currentOrderDiscountAmount) : appState.currentOrderOriginalTotal;
+        prepareAndShowReceipt(appState.currentQuickSaleOrder, "Hızlı Satış", appState.user.username, appState.currentOrderOriginalTotal, appState.currentOrderDiscountAmount > 0 ? finalTotal : null);
     }
 
 
@@ -1607,13 +1666,11 @@
     // Sadece fiş modalını kapatır
     function closeReceiptModalOnly() {
         receiptModal.classList.remove('active');
-        // Eğer hızlı satış fişi ise veya masa kapatıldıysa masalar ekranına dön
         const currentTable = appState.tables.find(t => t.id === appState.currentTableId);
         if (receiptTableName.textContent === "Hızlı Satış" || (currentTable && currentTable.status === 'boş')) {
+            resetCurrentOrderDiscount(); 
             showTablesView();
         }
-        // Aksi halde (normal masa fişi ve masa hala aktifse) sipariş ekranında kal.
-        // İndirim sıfırlama, masa kapatma ile yönetilecek.
     }
 
 
@@ -1627,15 +1684,17 @@
     quickSaleEntryButton.addEventListener('click', openQuickSaleModal); 
     closeQuickSaleModalButton.addEventListener('click', () => { 
         quickSaleModal.classList.remove('active');
+        resetCurrentOrderDiscount(); 
         showTablesView(); 
     });
     completeQuickSaleButton.addEventListener('click', completeQuickSale); 
+    applyQuickSaleDiscountButton.addEventListener('click', handleApplyQuickSaleDiscount); 
 
     backToTablesButton.addEventListener('click', showTablesView);
     addManualProductButton.addEventListener('click', addManualProduct); 
     showReceiptButton.addEventListener('click', handleShowReceipt); 
     finalizeAndCloseTableButton.addEventListener('click', handleFinalizeAndCloseTable); 
-    applyDiscountButton.addEventListener('click', handleApplyDiscount); // YENİ
+    applyDiscountButton.addEventListener('click', handleApplyDiscount); 
 
     printReceiptButton.addEventListener('click', handlePrintReceipt);
     closeReceiptModalOnlyButton.addEventListener('click', closeReceiptModalOnly); 
@@ -1645,7 +1704,7 @@
         if (appState.currentTableId && appState.user && appState.user.role === 'cashier') {
             showLoading("Masa kapatılıyor ve hesap tamamlanıyor...");
             sendMessageToServer('close_table', { tableId: appState.currentTableId });
-            resetDiscount(); // Masa kapatılınca indirimi sıfırla
+            resetCurrentOrderDiscount(); 
         }
         confirmCloseTableModal.classList.remove('active');
     });
@@ -1655,17 +1714,38 @@
 
     // Personel İndirimi Onay Modalı Butonları
     confirmDiscountYesButton.addEventListener('click', () => {
-        const table = appState.tables.find(t => t.id === appState.currentTableId);
-        if (table && table.order.length > 0) {
-            const originalTotal = table.total;
-            const discountAmount = originalTotal * 0.30;
-            appState.discountedTotal = originalTotal - discountAmount;
-            appState.discountApplied = true;
+        let originalTotalForDiscount = 0;
+        let targetDiscountInfoDiv = null;
+        let targetTotalDisplayElement = null;
+        let isQuickSaleContext = quickSaleModal.classList.contains('active');
 
-            orderPageCurrentOrderTotal.textContent = `Toplam: ${formatPrice(appState.discountedTotal)} (İndirimli)`;
-            discountInfoDiv.textContent = `İndirim Uygulandı: -${formatPrice(discountAmount)}`;
-            discountInfoDiv.classList.remove('hidden');
-            console.log("Personel indirimi uygulandı. Yeni toplam:", appState.discountedTotal);
+        if (!isQuickSaleContext && orderPageContainer.classList.contains('active') && appState.currentTableId) {
+            const table = appState.tables.find(t => t.id === appState.currentTableId);
+            if (table && table.order.length > 0) {
+                originalTotalForDiscount = table.total;
+                targetDiscountInfoDiv = discountInfoDiv;
+                targetTotalDisplayElement = orderPageCurrentOrderTotal;
+            }
+        } else if (isQuickSaleContext) {
+            if (appState.currentQuickSaleOrder.length > 0) {
+                originalTotalForDiscount = appState.currentQuickSaleOrder.reduce((sum, item) => sum + (item.priceAtOrder * item.quantity), 0);
+                appState.currentOrderOriginalTotal = originalTotalForDiscount; // Hızlı satış için de orijinal toplamı sakla
+                targetDiscountInfoDiv = quickSaleDiscountInfo;
+                targetTotalDisplayElement = quickSaleTotal;
+            }
+        }
+
+        if (originalTotalForDiscount > 0 && targetTotalDisplayElement) {
+            const discountAmount = originalTotalForDiscount * 0.30;
+            appState.currentOrderDiscountAmount = discountAmount; // Uygulanan indirimi sakla
+            
+            const discountedTotal = originalTotalForDiscount - discountAmount;
+            targetTotalDisplayElement.textContent = `Toplam: ${formatPrice(discountedTotal)} (İndirimli)`;
+            if(targetDiscountInfoDiv) {
+                targetDiscountInfoDiv.textContent = `İndirim Uygulandı: -${formatPrice(discountAmount)}`;
+                targetDiscountInfoDiv.classList.remove('hidden');
+            }
+            console.log("Personel indirimi uygulandı. Yeni toplam:", discountedTotal);
         }
         confirmDiscountModal.classList.remove('active');
     });
