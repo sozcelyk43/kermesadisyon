@@ -50,12 +50,14 @@ console.log(`EMET LEZZET GÜNLERİ HTTP Sunucusu ${HTTP_PORT} portunda başlatı
 console.log(`WebSocket sunucusu da bu HTTP sunucusu üzerinden çalışıyor.`);
 
 // --- Sunucu Verileri ---
+// *** YENİ KULLANICI LİSTESİ ***
 let users = [ 
-    { id: 1, username: 'garson1', password: 'sifre1', role: 'waiter' },
-    { id: 2, username: 'garson2', password: 'sifre2', role: 'waiter' },
-    { id: 3, username: 'kasa', password: 'kasa123', role: 'cashier' }, 
-    { id: 4, username: 'ahmet', password: 'ahmet1', role: 'waiter' },
-    { id: 5, username: 'ayse', password: 'ayse1', role: 'waiter' },
+    { id: 1, username: 'onkasa', password: 'onkasa12', role: 'cashier' },
+    { id: 2, username: 'arkakasa', password: 'arkakasa12', role: 'cashier' },
+    { id: 3, username: 'omerfaruk', password: 'omer.faruk', role: 'waiter' },
+    { id: 4, username: 'zeynel', password: 'zey.nel', role: 'waiter' },
+    { id: 5, username: 'halil', password: 'ha.lil', role: 'waiter' },
+    { id: 6, username: 'garson', password: 'gar.son', role: 'waiter' },
 ];
 
 // *** GÜNCELLENMİŞ ÜRÜN LİSTESİ ***
