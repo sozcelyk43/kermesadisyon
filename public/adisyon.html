@@ -185,7 +185,7 @@
             #salesReportModalContent button,
             #quickSaleModal button:not(#printReceiptButton), 
             #appContainer button#logoutButton, 
-            #orderPageContainer button:not(#printReceiptButton):not(#closeReceiptModalButton) 
+            #orderPageContainer button:not(#printReceiptButton):not(#closeReceiptModalButton):not(#finalizeAndCloseTableButton) /* Yeni buton hariç */
              {
                 display: none !important; 
             }
@@ -348,7 +348,10 @@
                 <div id="orderPageCurrentOrderTotal" class="text-right font-bold text-2xl mt-6 text-gray-800">
                     Toplam: 0 ₺
                 </div>
-                <button id="orderPageCompleteOrderButton" class="w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white font-semibold p-3 rounded-md transition duration-150 hidden">Siparişi Tamamla ve Fiş Yazdır</button>
+                <div class="mt-6 space-y-3">
+                    <button id="showReceiptButton" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold p-3 rounded-md transition duration-150">Fiş Göster/Yazdır</button>
+                    <button id="finalizeAndCloseTableButton" class="w-full bg-red-500 hover:bg-red-600 text-white font-semibold p-3 rounded-md transition duration-150 hidden">Masayı Kapat ve Hesabı Tamamla</button>
+                </div>
             </section>
         </div>
     </div>
@@ -402,7 +405,7 @@
             </div>
             <div class="mt-auto pt-4 flex space-x-2">
                 <button id="printReceiptButton" class="flex-1 bg-green-500 hover:bg-green-600 text-white font-semibold p-3 rounded-md transition duration-150">Yazdır</button>
-                <button id="closeReceiptModalButton" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white font-semibold p-3 rounded-md transition duration-150">Kapat</button>
+                <button id="closeReceiptModalOnlyButton" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white font-semibold p-3 rounded-md transition duration-150">Kapat</button>
             </div>
         </div>
     </div>
@@ -482,9 +485,9 @@
             { id: 3008, name: "MEYVELİ MADEN SUYU", price: 15.00, category: "İÇECEK" },
             { id: 3009, name: "KUTU İÇECEKLER", price: 30.00, category: "İÇECEK" }, 
 
-            { id: 4001, name: "BAKLAVA - KG", price: 400.00, category: "TATLI" },
-            { id: 4002, name: "BAKLAVA - 500 GRAM", price: 200.00, category: "TATLI" },
-            { id: 4003, name: "BAKLAVA - PORSİYON", price: 75.00, category: "TATLI" },
+            { id: 4001, name: "EV BAKLAVASI - KG", price: 400.00, category: "TATLI" },
+            { id: 4002, name: "EV BAKLAVASI - 500 GRAM", price: 200.00, category: "TATLI" },
+            { id: 4003, name: "EV BAKLAVASI - PORSİYON", price: 75.00, category: "TATLI" },
             { id: 4004, name: "AŞURE - 500 GRAM", price: 100.00, category: "TATLI" },
             { id: 4005, name: "HÖŞMERİM - 500 GRAM", price: 100.00, category: "TATLI" },
             { id: 4006, name: "DİĞER PASTA ÇEŞİTLERİ", price: 50.00, category: "TATLI" },
@@ -537,7 +540,8 @@
     const orderPageProductGrid = document.getElementById('orderPageProductGrid'); 
     const orderPageCurrentOrderItems = document.getElementById('orderPageCurrentOrderItems');
     const orderPageCurrentOrderTotal = document.getElementById('orderPageCurrentOrderTotal');
-    const orderPageCompleteOrderButton = document.getElementById('orderPageCompleteOrderButton');
+    const showReceiptButton = document.getElementById('showReceiptButton'); // ID Değişti
+    const finalizeAndCloseTableButton = document.getElementById('finalizeAndCloseTableButton'); // YENİ Buton
 
     const manualProductSection = document.getElementById('manualProductSection');
     const manualProductName = document.getElementById('manualProductName');
@@ -563,7 +567,7 @@
     const receiptItems = document.getElementById('receiptItems');
     const receiptTotal = document.getElementById('receiptTotal');
     const printReceiptButton = document.getElementById('printReceiptButton');
-    const closeReceiptModalButton = document.getElementById('closeReceiptModalButton');
+    const closeReceiptModalOnlyButton = document.getElementById('closeReceiptModalOnlyButton'); // ID Değişti
 
     const salesReportModal = document.getElementById('salesReportModal');
     const salesReportModalContent = document.getElementById('salesReportModalContent'); 
@@ -824,10 +828,14 @@
             manualProductSection.classList.remove('hidden');
             salesReportButton.classList.remove('hidden'); 
             quickSaleButtonContainerTop.classList.remove('hidden'); 
-        } else {
+            finalizeAndCloseTableButton.classList.remove('hidden'); // Kasa için "Masayı Kapat" butonunu göster
+            showReceiptButton.classList.remove('hidden'); // Kasa için "Fiş Göster" butonunu göster
+        } else { // Garson için
             manualProductSection.classList.add('hidden');
             salesReportButton.classList.add('hidden'); 
             quickSaleButtonContainerTop.classList.add('hidden'); 
+            finalizeAndCloseTableButton.classList.add('hidden'); // Garson için "Masayı Kapat" butonunu gizle
+            showReceiptButton.classList.add('hidden'); // Garson için "Fiş Göster" butonunu gizle (isteğe bağlı)
         }
     }
     
@@ -929,7 +937,6 @@
             categorySection.appendChild(categoryTitle);
 
             const productGrid = document.createElement('div');
-            // **DEĞİŞİKLİK:** Hızlı satış için 5 sütun (sm ve üzeri), normal sipariş için mobil 2, tablet+ 3 sütun
             productGrid.className = forQuickSale ? 'grid grid-cols-3 sm:grid-cols-5 gap-2' : 'grid grid-cols-2 md:grid-cols-3 gap-3'; 
 
             categories[category].sort((a, b) => a.name.localeCompare(b, 'tr')).forEach(product => {
@@ -1197,21 +1204,14 @@
             orderPageCurrentOrderTotal.textContent = `Toplam: ${formatPrice(table.total)}`;
         }
         
+        // Butonların görünürlüğünü ayarla
         if (appState.user && appState.user.role === 'cashier') {
-            orderPageCompleteOrderButton.classList.remove('hidden');
-        } else {
-            orderPageCompleteOrderButton.classList.add('hidden');
+            showReceiptButton.classList.remove('hidden');
+            finalizeAndCloseTableButton.classList.remove('hidden');
+        } else { // Garson için
+            showReceiptButton.classList.add('hidden'); // Garson fiş gösteremez/kesemez
+            finalizeAndCloseTableButton.classList.add('hidden');
         }
-
-        document.querySelectorAll('.remove-item-btn-orderpage').forEach(button => {
-            button.addEventListener('click', (e) => {
-                const buttonElement = e.target.closest('button');
-                const productIdToRemove = buttonElement.dataset.productId; 
-                const descriptionToRemove = buttonElement.dataset.description; 
-                const nameToRemove = buttonElement.dataset.itemName; 
-                removeItemFromOrderPage(productIdToRemove, descriptionToRemove, nameToRemove); 
-            });
-        });
     }
 
     // Satış Raporu Modalı'nı render eder
@@ -1377,14 +1377,35 @@
         });
     }
 
-    function completeOrderAndShowReceiptOnPage() {
-        const table = appState.tables.find(t => t.id === appState.currentTableId);
-        if (!table || !table.order || table.order.length === 0) {
-            alert("Masada tamamlanacak sipariş bulunmuyor.");
-            return;
+    // Fiş modalını açar (Sadece Kasa için)
+    function handleShowReceipt() {
+        if (appState.user && appState.user.role === 'cashier') {
+            const table = appState.tables.find(t => t.id === appState.currentTableId);
+            if (!table || !table.order || table.order.length === 0) {
+                alert("Masada fiş kesilecek sipariş bulunmuyor.");
+                return;
+            }
+            prepareAndShowReceipt(table.order, table.name, table.waiterUsername, table.total);
+        } else {
+            alert("Fiş gösterme/yazdırma yetkiniz yok.");
         }
-        prepareAndShowReceipt(table.order, table.name, table.waiterUsername, table.total);
     }
+
+    // YENİ: Masayı kapatma fonksiyonu (Sadece Kasa için)
+    function handleFinalizeAndCloseTable() {
+        if (appState.currentTableId && appState.user && appState.user.role === 'cashier') {
+            if (confirm("Masayı kapatmak ve hesabı tamamlamak istediğinizden emin misiniz? Bu işlem geri alınamaz.")) {
+                showLoading("Masa kapatılıyor ve hesap tamamlanıyor...");
+                sendMessageToServer('close_table', { tableId: appState.currentTableId });
+                // Sunucudan tables_update mesajı gelince showTablesView otomatik çağrılacak
+                // Ancak hemen yönlendirme de yapılabilir:
+                // setTimeout(showTablesView, 500); // Küçük bir gecikme ile
+            }
+        } else {
+            alert("Masayı kapatma yetkiniz yok.");
+        }
+    }
+
     
     // Hızlı Satış Modalını Açma
     function openQuickSaleModal() {
@@ -1413,8 +1434,9 @@
         });
         const quickSaleTotalAmount = appState.currentQuickSaleOrder.reduce((sum, item) => sum + (item.priceAtOrder * item.quantity), 0);
         prepareAndShowReceipt(appState.currentQuickSaleOrder, "Hızlı Satış", appState.user.username, quickSaleTotalAmount);
-        quickSaleModal.classList.remove('active'); 
-        showTablesView(); 
+        // Hızlı satış sonrası modalı kapatıp masalar ekranına dön
+        // quickSaleModal.classList.remove('active'); 
+        // showTablesView(); // Bu zaten closeReceiptModalOnly içinde çağrılıyor
     }
 
 
@@ -1483,22 +1505,15 @@
         window.print(); 
     }
 
-
-    function closeReceiptAndResetTable() {
-        // Sadece normal masa siparişinden geliyorsa ve kasaysa masayı kapat
-        if (appState.currentTableId && appState.user && appState.user.role === 'cashier') {
-            showLoading("Masa kapatılıyor...");
-            sendMessageToServer('close_table', { tableId: appState.currentTableId }); 
-        } else if (appState.user && appState.user.role !== 'cashier' && appState.currentTableId) {
-             console.log("Garson fiş modalını kapattı, masa açık kalacak.");
-        }
+    // YENİ: Sadece fiş modalını kapatır
+    function closeReceiptModalOnly() {
         receiptModal.classList.remove('active');
-        if (appState.currentTableId && !(appState.user && appState.user.role === 'cashier')) {
+        // Eğer hızlı satış fişi ise masalar ekranına dön, değilse sipariş ekranında kal
+        if (receiptTableName.textContent === "Hızlı Satış") {
             showTablesView();
-        } else {
-            showTablesView(); 
         }
     }
+
 
     // --- Event Listeners ---
     loginButton.addEventListener('click', handleLogin);
@@ -1516,9 +1531,12 @@
 
     backToTablesButton.addEventListener('click', showTablesView);
     addManualProductButton.addEventListener('click', addManualProduct); 
-    orderPageCompleteOrderButton.addEventListener('click', completeOrderAndShowReceiptOnPage);
+    showReceiptButton.addEventListener('click', handleShowReceipt); // Eski completeOrder... -> handleShowReceipt
+    finalizeAndCloseTableButton.addEventListener('click', handleFinalizeAndCloseTable); // YENİ
+
     printReceiptButton.addEventListener('click', handlePrintReceipt);
-    closeReceiptModalButton.addEventListener('click', closeReceiptAndResetTable);
+    closeReceiptModalOnlyButton.addEventListener('click', closeReceiptModalOnly); // Eski closeReceiptAndResetTable -> closeReceiptModalOnly
+    
     closeSalesReportModalButton.addEventListener('click', () => salesReportModal.classList.remove('active')); 
     refreshSalesReportButton.addEventListener('click', () => { 
         showLoading("Rapor güncelleniyor...");
