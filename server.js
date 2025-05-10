@@ -60,7 +60,7 @@ let users = [
 
 // *** GÜNCELLENMİŞ ÜRÜN LİSTESİ ***
 let products = [ 
-    // ET - TAVUK Kategorisi (ID'ler 1000'den başlasın)
+    // ET - TAVUK Kategorisi
     { id: 1001, name: "TAVUK (PİLİÇ) ÇEVİRME KG", price: 250.00, category: "ET - TAVUK" },
     { id: 1002, name: "ET DÖNER PORSİYON (100 GRAM)", price: 185.00, category: "ET - TAVUK" },
     { id: 1003, name: "YAPRAK DÖNER PORSİYON (100 GRAM)", price: 150.00, category: "ET - TAVUK" },
@@ -82,7 +82,7 @@ let products = [
     { id: 1019, name: "CİĞER ŞİŞ (100 gr.) SERVİSLİ", price: 80.00, category: "ET - TAVUK" },
     { id: 1020, name: "TAVUK ŞİŞ (100 gr.) SERVİSLİ", price: 90.00, category: "ET - TAVUK" },
 
-    // ATIŞTIRMALIK Kategorisi (ID'ler 2000'den başlasın)
+    // ATIŞTIRMALIK Kategorisi
     { id: 2001, name: "EKMEK ARASI ET DÖNER (80 GR)", price: 160.00, category: "ATIŞTIRMALIK" },
     { id: 2002, name: "EKMEK ARASI KÖFTE (100 gr 5 adet)", price: 130.00, category: "ATIŞTIRMALIK" },
     { id: 2003, name: "TAVUK DÖNER EKMEK ARASI (80 gr)", price: 130.00, category: "ATIŞTIRMALIK" },
@@ -95,7 +95,7 @@ let products = [
     { id: 2010, name: "ÇİĞ KÖFTE KG (MARUL-LİMON)", price: 300.00, category: "ATIŞTIRMALIK" },
     { id: 2011, name: "KUMRU", price: 80.00, category: "ATIŞTIRMALIK" }, 
 
-    // İÇECEK Kategorisi (ID'ler 3000'den başlasın)
+    // İÇECEK Kategorisi
     { id: 3001, name: "OSMANLI ŞERBETİ - 1 LİTRE", price: 75.00, category: "İÇECEK" },
     { id: 3002, name: "LİMONATA", price: 75.00, category: "İÇECEK" },
     { id: 3003, name: "SU", price: 10.00, category: "İÇECEK" },
@@ -106,10 +106,10 @@ let products = [
     { id: 3008, name: "MEYVELİ MADEN SUYU", price: 15.00, category: "İÇECEK" },
     { id: 3009, name: "KUTU İÇECEKLER", price: 30.00, category: "İÇECEK" }, 
 
-    // TATLI Kategorisi (ID'ler 4000'den başlasın)
-    { id: 4001, name: "BAKLAVA - KG", price: 400.00, category: "TATLI" },
-    { id: 4002, name: "BAKLAVA - 500 GRAM", price: 200.00, category: "TATLI" },
-    { id: 4003, name: "BAKLAVA - PORSİYON", price: 75.00, category: "TATLI" },
+    // TATLI Kategorisi
+    { id: 4001, name: "EV BAKLAVASI - KG", price: 400.00, category: "TATLI" },
+    { id: 4002, name: "EV BAKLAVASI - 500 GRAM", price: 200.00, category: "TATLI" },
+    { id: 4003, name: "EV BAKLAVASI - PORSİYON", price: 75.00, category: "TATLI" },
     { id: 4004, name: "AŞURE - 500 GRAM", price: 100.00, category: "TATLI" },
     { id: 4005, name: "HÖŞMERİM - 500 GRAM", price: 100.00, category: "TATLI" },
     { id: 4006, name: "DİĞER PASTA ÇEŞİTLERİ", price: 50.00, category: "TATLI" },
@@ -120,11 +120,11 @@ let products = [
     { id: 4011, name: "AŞURE - KG", price: 125.00, category: "TATLI" }, 
     { id: 4012, name: "HÖŞMERİM - KG", price: 110.00, category: "TATLI" }, 
 
-    // ÇORBA Kategorisi (ID'ler 5000'den başlasın)
+    // ÇORBA Kategorisi
     { id: 5001, name: "KELLE PAÇA ÇORBA", price: 60.00, category: "ÇORBA" },
     { id: 5002, name: "TARHANA ÇORBA", price: 60.00, category: "ÇORBA" },
     
-    // DİĞER Kategorisi (ID'ler 6000'den başlasın)
+    // DİĞER Kategorisi
     { id: 6001, name: "PİŞMEMİŞ KASAP KÖFTE", price: 620.00, category: "DİĞER" },
     { id: 6002, name: "PİŞMEMİŞ İNEGÖL KÖFTE", price: 620.00, category: "DİĞER" },
     { id: 6003, name: "BÜYÜKBAŞ DANA KIYMA KG", price: 650.00, category: "DİĞER" },
@@ -134,6 +134,7 @@ let products = [
     { id: 6007, name: "SARMA (ZEYTİNYAĞLI) KG.", price: 270.00, category: "DİĞER" }
 ];
 // *** ÜRÜN LİSTESİ SONU ***
+
 
 let tables = []; 
 let completedOrders = []; 
@@ -359,7 +360,7 @@ wss.on('connection', (ws) => {
                             quantity: item.quantity,
                             priceAtOrder: item.priceAtOrder,
                             description: item.description || '',
-                            category: products.find(p => p.id === item.productId)?.category || 'Hızlı Satış', // Ürünün kategorisini bul veya varsayılan ata
+                            category: products.find(p => p.id === item.productId)?.category || 'Hızlı Satış', 
                             waiterUsername: payload.cashierUsername, 
                             timestamp: item.timestamp || quickSaleTimestamp, 
                             tableName: 'Hızlı Satış', 
