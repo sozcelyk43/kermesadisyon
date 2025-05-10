@@ -335,7 +335,8 @@ wss.on('connection', (ws) => {
                     tableForManual.waiterId = currentUserInfo.id; 
                     tableForManual.waiterUsername = currentUserInfo.username; 
 
-                    // ws.send(JSON.stringify({ type: 'order_update_success', payload: { tableId: tableForManual.id, manual: true } })); // Bu satır yerine sadece broadcast
+                    // **DÜZELTME:** Başarılı manuel ekleme sonrası gereksiz mesajı kaldır, sadece broadcastTableUpdates() kalsın.
+                    // ws.send(JSON.stringify({ type: 'order_update_success', payload: { tableId: tableForManual.id, manual: true } })); 
                     broadcastTableUpdates();
                 } else {
                      ws.send(JSON.stringify({ type: 'manual_order_update_fail', payload: { error: 'Geçersiz masa veya manuel ürün bilgileri.' } }));
