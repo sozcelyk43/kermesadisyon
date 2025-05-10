@@ -59,7 +59,6 @@ let users = [
     { id: 6, username: 'garson', password: 'gar.son', role: 'waiter' },
 ];
 
-// *** GÜNCELLENMİŞ ÜRÜN LİSTESİ ***
 let products = [ 
     // ET - TAVUK Kategorisi
     { id: 1001, name: "TAVUK (PİLİÇ) ÇEVİRME KG", price: 250.00, category: "ET - TAVUK" },
@@ -300,7 +299,7 @@ wss.on('connection', (ws) => {
                     tableToAdd.waiterId = currentUserInfo.id; 
                     tableToAdd.waiterUsername = currentUserInfo.username; 
 
-                    ws.send(JSON.stringify({ type: 'order_update_success', payload: { tableId: tableToAdd.id } }));
+                    // ws.send(JSON.stringify({ type: 'order_update_success', payload: { tableId: tableToAdd.id } })); // Bu satır yerine sadece broadcast
                     broadcastTableUpdates(); 
                 } else {
                     console.error(`Sipariş eklenemedi: Masa=${!!tableToAdd}, Ürün=${!!productToAdd}, Adet=${payload.quantity}`);
@@ -336,7 +335,7 @@ wss.on('connection', (ws) => {
                     tableForManual.waiterId = currentUserInfo.id; 
                     tableForManual.waiterUsername = currentUserInfo.username; 
 
-                    ws.send(JSON.stringify({ type: 'order_update_success', payload: { tableId: tableForManual.id, manual: true } }));
+                    // ws.send(JSON.stringify({ type: 'order_update_success', payload: { tableId: tableForManual.id, manual: true } })); // Bu satır yerine sadece broadcast
                     broadcastTableUpdates();
                 } else {
                      ws.send(JSON.stringify({ type: 'manual_order_update_fail', payload: { error: 'Geçersiz masa veya manuel ürün bilgileri.' } }));
