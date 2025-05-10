@@ -176,6 +176,11 @@ function broadcastTableUpdates() {
     broadcast({ type: 'tables_update', payload: { tables: tables } });
 }
 
+// YENİ: Tüm bağlı istemcilere güncellenmiş ürün listesini gönderir
+function broadcastProductsUpdate() {
+    broadcast({ type: 'products_update', payload: { products: products } });
+}
+
 // Fiyatı hesaplamak için yardımcı fonksiyon
 function calculateTableTotal(order) {
     return order.reduce((sum, item) => {
@@ -220,6 +225,7 @@ wss.on('connection', (ws) => {
                         payload: {
                             user: { id: user.id, username: user.username, role: user.role }, 
                             tables: tables, 
+                            products: products // Girişte ürün listesini de gönder
                         }
                     }));
                     console.log(`Kullanıcı giriş yaptı: ${user.username} (Rol: ${user.role})`);
@@ -243,7 +249,9 @@ wss.on('connection', (ws) => {
                          clients.set(ws, payload.user); 
                          currentUserInfo = payload.user; 
                          console.log(`Kullanıcı oturumu sürdürdü: ${currentUserInfo.username}`);
+                         // Oturum sürdürüldükten sonra güncel masa ve ürün verilerini gönder
                          ws.send(JSON.stringify({ type: 'tables_update', payload: { tables: tables } }));
+                         ws.send(JSON.stringify({ type: 'products_update', payload: { products: products } }));
                      } else {
                          console.log("[reauthenticate] Geçersiz kullanıcı bilgisi.");
                          ws.send(JSON.stringify({ type: 'error', payload: { message: 'Geçersiz oturum bilgisi.' } }));
@@ -299,7 +307,6 @@ wss.on('connection', (ws) => {
                     tableToAdd.waiterId = currentUserInfo.id; 
                     tableToAdd.waiterUsername = currentUserInfo.username; 
 
-                    // ws.send(JSON.stringify({ type: 'order_update_success', payload: { tableId: tableToAdd.id } })); // Bu satır yerine sadece broadcast
                     broadcastTableUpdates(); 
                 } else {
                     console.error(`Sipariş eklenemedi: Masa=${!!tableToAdd}, Ürün=${!!productToAdd}, Adet=${payload.quantity}`);
@@ -307,7 +314,7 @@ wss.on('connection', (ws) => {
                 }
                 break;
 
-            case 'add_manual_order_item':
+            case 'add_manual_order_item': // Bu, masanın siparişine özel ürün ekler, ana menüyü DEĞİŞTİRMEZ.
                  if (!currentUserInfo) { 
                     ws.send(JSON.stringify({ type: 'error', payload: { message: 'İşlem için giriş yapmalısınız.' } }));
                     return;
@@ -334,14 +341,35 @@ wss.on('connection', (ws) => {
                     tableForManual.status = 'dolu';
                     tableForManual.waiterId = currentUserInfo.id; 
                     tableForManual.waiterUsername = currentUserInfo.username; 
-
-                    // **DÜZELTME:** Başarılı manuel ekleme sonrası gereksiz mesajı kaldır, sadece broadcastTableUpdates() kalsın.
-                    // ws.send(JSON.stringify({ type: 'order_update_success', payload: { tableId: tableForManual.id, manual: true } })); 
                     broadcastTableUpdates();
                 } else {
                      ws.send(JSON.stringify({ type: 'manual_order_update_fail', payload: { error: 'Geçersiz masa veya manuel ürün bilgileri.' } }));
                 }
                 break;
+            
+            // YENİ: Ana menüye kalıcı ürün ekleme
+            case 'add_product_to_main_menu':
+                if (!currentUserInfo || currentUserInfo.role !== 'cashier') {
+                    ws.send(JSON.stringify({ type: 'error', payload: { message: 'Bu işlem için yetkiniz yok.' } }));
+                    return;
+                }
+                if (payload && payload.name && payload.price >= 0 && payload.category) {
+                    const newProductId = products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 7001; // Benzersiz ID oluştur
+                    const newProduct = {
+                        id: newProductId,
+                        name: payload.name.toUpperCase(),
+                        price: parseFloat(payload.price),
+                        category: payload.category,
+                    };
+                    products.push(newProduct);
+                    console.log(`Yeni ürün menüye eklendi: ${newProduct.name}`);
+                    broadcastProductsUpdate(); // Tüm istemcilere güncel ürün listesini gönder
+                    ws.send(JSON.stringify({ type: 'main_menu_product_added', payload: { product: newProduct } })); // Başarı mesajı
+                } else {
+                    ws.send(JSON.stringify({ type: 'error', payload: { message: 'Eksik ürün bilgisi.' } }));
+                }
+                break;
+
 
             case 'complete_quick_sale':
                 if (!currentUserInfo) {
