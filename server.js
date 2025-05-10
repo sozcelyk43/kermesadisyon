@@ -50,7 +50,6 @@ console.log(`EMET LEZZET GÜNLERİ HTTP Sunucusu ${HTTP_PORT} portunda başlatı
 console.log(`WebSocket sunucusu da bu HTTP sunucusu üzerinden çalışıyor.`);
 
 // --- Sunucu Verileri ---
-// *** YENİ KULLANICI LİSTESİ ***
 let users = [ 
     { id: 1, username: 'onkasa', password: 'onkasa12', role: 'cashier' },
     { id: 2, username: 'arkakasa', password: 'arkakasa12', role: 'cashier' },
@@ -64,7 +63,7 @@ let users = [
 let products = [ 
     // ET - TAVUK Kategorisi
     { id: 1001, name: "TAVUK (PİLİÇ) ÇEVİRME KG", price: 250.00, category: "ET - TAVUK" },
-    { id: 1002, name: "ET DÖNER PORSİYON (100 GRAM)", price: 185.00, category: "ET - TAVUK" },
+    { id: 1002, name: "ET DÖNER PORSİYON (100 GRAM)", price: 175.00, category: "ET - TAVUK" },
     { id: 1003, name: "YAPRAK DÖNER PORSİYON (100 GRAM)", price: 150.00, category: "ET - TAVUK" },
     { id: 1004, name: "TAVUK DÖNER PORSİYON (100gr)", price: 150.00, category: "ET - TAVUK" },
     { id: 1005, name: "KÖFTE PORSİYON (120 gr 6 adet) SERVİSLİ", price: 150.00, category: "ET - TAVUK" },
@@ -81,11 +80,11 @@ let products = [
     { id: 1016, name: "ÇITIR PİRZOLA (KELEBEK) KG PİŞMİŞ SERVİSLİ", price: 350.00, category: "ET - TAVUK" },
     { id: 1017, name: "KANAT IZGARA KG PİŞMİŞ SERVİSLİ", price: 550.00, category: "ET - TAVUK" },
     { id: 1018, name: "TAVUK PİRZOLA KG PİŞMİŞ SERVİSLİ", price: 530.00, category: "ET - TAVUK" },
-    { id: 1019, name: "CİĞER ŞİŞ (100 gr.) SERVİSLİ", price: 80.00, category: "ET - TAVUK" },
+    { id: 1019, name: "CİĞER ŞİŞ 100 gr. (SERVİSLİ)", price: 80.00, category: "ET - TAVUK" },
     { id: 1020, name: "TAVUK ŞİŞ (100 gr.) SERVİSLİ", price: 90.00, category: "ET - TAVUK" },
 
     // ATIŞTIRMALIK Kategorisi
-    { id: 2001, name: "EKMEK ARASI ET DÖNER (80 GR)", price: 160.00, category: "ATIŞTIRMALIK" },
+    { id: 2001, name: "EKMEK ARASI ET DÖNER (80 GR)", price: 150.00, category: "ATIŞTIRMALIK" },
     { id: 2002, name: "EKMEK ARASI KÖFTE (100 gr 5 adet)", price: 130.00, category: "ATIŞTIRMALIK" },
     { id: 2003, name: "TAVUK DÖNER EKMEK ARASI (80 gr)", price: 130.00, category: "ATIŞTIRMALIK" },
     { id: 2004, name: "PİZZA KARIŞIK (ORTA BOY)", price: 150.00, category: "ATIŞTIRMALIK" },
