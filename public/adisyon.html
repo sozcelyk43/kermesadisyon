@@ -185,7 +185,8 @@
             #salesReportModalContent button,
             #quickSaleModal button:not(#printReceiptButton), 
             #appContainer button#logoutButton, 
-            #orderPageContainer button:not(#printReceiptButton):not(#closeReceiptModalButton):not(#finalizeAndCloseTableButton) /* Yeni buton hariç */
+            #orderPageContainer button:not(#printReceiptButton):not(#closeReceiptModalButton):not(#finalizeAndCloseTableButton), 
+            #confirmCloseTableModal button /* Onay modalı butonları yazdırmada gizli */
              {
                 display: none !important; 
             }
@@ -410,6 +411,18 @@
         </div>
     </div>
 
+    <div id="confirmCloseTableModal" class="modal fixed inset-0 bg-gray-900 bg-opacity-75 items-center justify-center z-50">
+        <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-sm text-center">
+            <h2 class="text-xl font-semibold mb-4 text-gray-800">Masayı Kapat Onayı</h2>
+            <p class="text-gray-600 mb-6">Masayı kapatmak ve hesabı tamamlamak istediğinizden emin misiniz? Bu işlem geri alınamaz.</p>
+            <div class="flex justify-center gap-4">
+                <button id="confirmCloseTableYesButton" class="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-6 rounded-md transition duration-150">Evet, Kapat</button>
+                <button id="confirmCloseTableNoButton" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-6 rounded-md transition duration-150">Hayır, Vazgeç</button>
+            </div>
+        </div>
+    </div>
+
+
     <div id="salesReportModal" class="modal fixed inset-0 bg-gray-900 bg-opacity-75 items-center justify-center z-50">
         <div id="salesReportModalContent" class="bg-white p-6 md:p-8 rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col">
             <div class="flex justify-between items-center mb-4">
@@ -540,8 +553,8 @@
     const orderPageProductGrid = document.getElementById('orderPageProductGrid'); 
     const orderPageCurrentOrderItems = document.getElementById('orderPageCurrentOrderItems');
     const orderPageCurrentOrderTotal = document.getElementById('orderPageCurrentOrderTotal');
-    const showReceiptButton = document.getElementById('showReceiptButton'); // ID Değişti
-    const finalizeAndCloseTableButton = document.getElementById('finalizeAndCloseTableButton'); // YENİ Buton
+    const showReceiptButton = document.getElementById('showReceiptButton'); 
+    const finalizeAndCloseTableButton = document.getElementById('finalizeAndCloseTableButton'); 
 
     const manualProductSection = document.getElementById('manualProductSection');
     const manualProductName = document.getElementById('manualProductName');
@@ -567,7 +580,13 @@
     const receiptItems = document.getElementById('receiptItems');
     const receiptTotal = document.getElementById('receiptTotal');
     const printReceiptButton = document.getElementById('printReceiptButton');
-    const closeReceiptModalOnlyButton = document.getElementById('closeReceiptModalOnlyButton'); // ID Değişti
+    const closeReceiptModalOnlyButton = document.getElementById('closeReceiptModalOnlyButton'); 
+
+    // Masa Kapatma Onay Modalı Elementleri
+    const confirmCloseTableModal = document.getElementById('confirmCloseTableModal');
+    const confirmCloseTableYesButton = document.getElementById('confirmCloseTableYesButton');
+    const confirmCloseTableNoButton = document.getElementById('confirmCloseTableNoButton');
+
 
     const salesReportModal = document.getElementById('salesReportModal');
     const salesReportModalContent = document.getElementById('salesReportModalContent'); 
@@ -828,14 +847,14 @@
             manualProductSection.classList.remove('hidden');
             salesReportButton.classList.remove('hidden'); 
             quickSaleButtonContainerTop.classList.remove('hidden'); 
-            finalizeAndCloseTableButton.classList.remove('hidden'); // Kasa için "Masayı Kapat" butonunu göster
-            showReceiptButton.classList.remove('hidden'); // Kasa için "Fiş Göster" butonunu göster
-        } else { // Garson için
+            finalizeAndCloseTableButton.classList.remove('hidden'); 
+            showReceiptButton.classList.remove('hidden'); 
+        } else { 
             manualProductSection.classList.add('hidden');
             salesReportButton.classList.add('hidden'); 
             quickSaleButtonContainerTop.classList.add('hidden'); 
-            finalizeAndCloseTableButton.classList.add('hidden'); // Garson için "Masayı Kapat" butonunu gizle
-            showReceiptButton.classList.add('hidden'); // Garson için "Fiş Göster" butonunu gizle (isteğe bağlı)
+            finalizeAndCloseTableButton.classList.add('hidden'); 
+            showReceiptButton.classList.add('hidden'); 
         }
     }
     
@@ -1391,16 +1410,11 @@
         }
     }
 
-    // YENİ: Masayı kapatma fonksiyonu (Sadece Kasa için)
+    // Masayı kapatma fonksiyonu (Sadece Kasa için)
     function handleFinalizeAndCloseTable() {
         if (appState.currentTableId && appState.user && appState.user.role === 'cashier') {
-            if (confirm("Masayı kapatmak ve hesabı tamamlamak istediğinizden emin misiniz? Bu işlem geri alınamaz.")) {
-                showLoading("Masa kapatılıyor ve hesap tamamlanıyor...");
-                sendMessageToServer('close_table', { tableId: appState.currentTableId });
-                // Sunucudan tables_update mesajı gelince showTablesView otomatik çağrılacak
-                // Ancak hemen yönlendirme de yapılabilir:
-                // setTimeout(showTablesView, 500); // Küçük bir gecikme ile
-            }
+            // Onay modalını göster
+            confirmCloseTableModal.classList.add('active');
         } else {
             alert("Masayı kapatma yetkiniz yok.");
         }
@@ -1434,9 +1448,6 @@
         });
         const quickSaleTotalAmount = appState.currentQuickSaleOrder.reduce((sum, item) => sum + (item.priceAtOrder * item.quantity), 0);
         prepareAndShowReceipt(appState.currentQuickSaleOrder, "Hızlı Satış", appState.user.username, quickSaleTotalAmount);
-        // Hızlı satış sonrası modalı kapatıp masalar ekranına dön
-        // quickSaleModal.classList.remove('active'); 
-        // showTablesView(); // Bu zaten closeReceiptModalOnly içinde çağrılıyor
     }
 
 
@@ -1505,10 +1516,9 @@
         window.print(); 
     }
 
-    // YENİ: Sadece fiş modalını kapatır
+    // Sadece fiş modalını kapatır
     function closeReceiptModalOnly() {
         receiptModal.classList.remove('active');
-        // Eğer hızlı satış fişi ise masalar ekranına dön, değilse sipariş ekranında kal
         if (receiptTableName.textContent === "Hızlı Satış") {
             showTablesView();
         }
@@ -1531,11 +1541,25 @@
 
     backToTablesButton.addEventListener('click', showTablesView);
     addManualProductButton.addEventListener('click', addManualProduct); 
-    showReceiptButton.addEventListener('click', handleShowReceipt); // Eski completeOrder... -> handleShowReceipt
-    finalizeAndCloseTableButton.addEventListener('click', handleFinalizeAndCloseTable); // YENİ
+    showReceiptButton.addEventListener('click', handleShowReceipt); 
+    finalizeAndCloseTableButton.addEventListener('click', handleFinalizeAndCloseTable); 
 
     printReceiptButton.addEventListener('click', handlePrintReceipt);
-    closeReceiptModalOnlyButton.addEventListener('click', closeReceiptModalOnly); // Eski closeReceiptAndResetTable -> closeReceiptModalOnly
+    closeReceiptModalOnlyButton.addEventListener('click', closeReceiptModalOnly); 
+    
+    // Masa Kapatma Onay Modalı Butonları
+    confirmCloseTableYesButton.addEventListener('click', () => {
+        if (appState.currentTableId && appState.user && appState.user.role === 'cashier') {
+            showLoading("Masa kapatılıyor ve hesap tamamlanıyor...");
+            sendMessageToServer('close_table', { tableId: appState.currentTableId });
+        }
+        confirmCloseTableModal.classList.remove('active');
+        // showTablesView(); // Sunucudan gelen tables_update ile tetiklenecek
+    });
+    confirmCloseTableNoButton.addEventListener('click', () => {
+        confirmCloseTableModal.classList.remove('active');
+    });
+
     
     closeSalesReportModalButton.addEventListener('click', () => salesReportModal.classList.remove('active')); 
     refreshSalesReportButton.addEventListener('click', () => { 
