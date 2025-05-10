@@ -9,11 +9,11 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f9fafb; /* Slightly lighter gray background */
+            background-color: #f9fafb; /* Biraz daha açık gri arka plan */
         }
         /* Kategori Alanı Stilleri */
         .category-section {
-             border: 1px solid #e5e7eb; /* Lighter border */
+             border: 1px solid #e5e7eb; /* Daha açık kenarlık */
              transition: box-shadow 0.3s ease-in-out;
         }
          .category-section:hover {
@@ -62,7 +62,7 @@
     </div>
 
 <script>
-    // GÜNCELLENMİŞ ÜRÜN LİSTESİ
+    // Ürün listesi (adisyon.html ve server.js ile aynı olmalı)
     const products = [ 
         // ET - TAVUK Kategorisi
         { id: 1001, name: "TAVUK (PİLİÇ) ÇEVİRME KG", price: 250.00, category: "ET - TAVUK" },
@@ -140,7 +140,7 @@
 
     const menuContainer = document.getElementById('menuContainer');
 
-    // Fiyat formatlama fonksiyonu
+    // Fiyat formatlama fonksiyonu (adisyon.html ile aynı)
     function formatPrice(price) {
         if (typeof price !== 'number' || isNaN(price)) {
             return '0 ₺'; 
