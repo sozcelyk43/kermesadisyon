@@ -196,7 +196,7 @@
             #orderPageContainer button:not(#printReceiptButton):not(#closeReceiptModalOnlyButton):not(#finalizeAndCloseTableButton), 
             #confirmCloseTableModal button,
             #confirmDiscountModal button,
-            #addProductToMenuModal button /* Yeni ürün ekleme modalı butonları */
+            #addProductToMenuModal button 
              {
                 display: none !important; 
             }
@@ -206,7 +206,7 @@
              }
              #quickSaleButtonContainerTop, 
              #salesReportButton,
-             #addProductToMenuButton /* Yeni ürün ekleme butonu */
+             #addProductToMenuButton
               { 
                 display: none !important;
              }
@@ -342,7 +342,7 @@
                     </div>
 
                 <div id="manualProductSection" class="mt-6 pt-6 border-t border-gray-200 hidden">
-                    <h3 class="text-lg font-semibold mb-3 text-orange-600">Manuel Ürün Ekle (Sadece Kasa)</h3>
+                    <h3 class="text-lg font-semibold mb-3 text-orange-600">Manuel Ürün Ekle (Sadece Kasa - Bu siparişe özel)</h3>
                     <div class="space-y-3">
                         <input type="text" id="manualProductName" placeholder="Ürün Adı" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-500">
                          <div>
@@ -354,7 +354,7 @@
                         <input type="number" id="manualProductPrice" placeholder="Fiyat (₺)" step="0.01" min="0" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-500">
                         <input type="number" id="manualProductQuantity" placeholder="Adet" value="1" min="1" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-500">
                         <input type="text" id="manualProductDescription" placeholder="Açıklama (isteğe bağlı)" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-500">
-                        <button id="addManualProductButton" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold p-2 rounded-md transition duration-150">Manuel Ürünü Ekle</button>
+                        <button id="addManualProductButton" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold p-2 rounded-md transition duration-150">Manuel Ürünü Siparişe Ekle</button>
                     </div>
                 </div>
             </section>
@@ -524,39 +524,40 @@
     const appState = {
         user: null, 
         products: [ 
-            { id: 1001, name: "TAVUK (PİLİÇ) ÇEVİRME KG", price: 250.00, category: "ET - TAVUK" },
-            { id: 1002, name: "ET DÖNER PORSİYON (100 GRAM)", price: 175.00, category: "ET - TAVUK" },
-            { id: 1003, name: "YAPRAK DÖNER PORSİYON (100 GRAM)", price: 150.00, category: "ET - TAVUK" }, 
-            { id: 1004, name: "TAVUK DÖNER PORSİYON (100gr)", price: 150.00, category: "ET - TAVUK" }, 
-            { id: 1005, name: "KÖFTE PORSİYON (120 gr 6 adet) SERVİSLİ", price: 150.00, category: "ET - TAVUK" }, 
-            { id: 1006, name: "ET İSKENDER (110 gr)", price: 275.00, category: "ET - TAVUK" },
-            { id: 1007, name: "TAVUK İSKENDER (110 gr)", price: 200.00, category: "ET - TAVUK" },
-            { id: 1008, name: "ET DÖNER - KG", price: 1300.00, category: "ET - TAVUK" }, 
-            { id: 1009, name: "ET DÖNER - 500 GR", price: 650.00, category: "ET - TAVUK" }, 
-            { id: 1010, name: "TAVUK DÖNER - KG", price: 800.00, category: "ET - TAVUK" }, 
-            { id: 1011, name: "TAVUK DÖNER - 500 GR", price: 400.00, category: "ET - TAVUK" }, 
-            { id: 1012, name: "KUZU ŞİŞ (100 gr.) SERVİSLİ", price: 150.00, category: "ET - TAVUK" }, 
-            { id: 1013, name: "ADANA ŞİŞ (100 gr.)", price: 150.00, category: "ET - TAVUK" }, 
-            { id: 1014, name: "PİRZOLA - 4 ADET", price: 250.00, category: "ET - TAVUK" },
-            { id: 1015, name: "TAVUK FAJİTA", price: 200.00, category: "ET - TAVUK" },
-            { id: 1016, name: "ÇITIR PİRZOLA (KELEBEK) KG PİŞMİŞ SERVİSLİ", price: 350.00, category: "ET - TAVUK" },
-            { id: 1017, name: "KANAT IZGARA KG PİŞMİŞ SERVİSLİ", price: 550.00, category: "ET - TAVUK" },
-            { id: 1018, name: "TAVUK PİRZOLA KG PİŞMİŞ SERVİSLİ", price: 530.00, category: "ET - TAVUK" },
-            { id: 1019, name: "CİĞER ŞİŞ 100 gr. (SERVİSLİ)", price: 80.00, category: "ET - TAVUK" },
-            { id: 1020, name: "TAVUK ŞİŞ (100 gr.) SERVİSLİ", price: 90.00, category: "ET - TAVUK" },
+            // ET - TAVUK Kategorisi
+            { id: 1001, name: "İSKENDER - 120 GR", price: 275.00, category: "ET - TAVUK" },
+            { id: 1002, name: "ET DÖNER EKMEK ARASI", price: 150.00, category: "ET - TAVUK" },
+            { id: 1003, name: "ET DÖNER PORSİYON", price: 175.00, category: "ET - TAVUK" },
+            { id: 1004, name: "TAVUK DÖNER EKMEK ARASI", price: 130.00, category: "ET - TAVUK" },
+            { id: 1005, name: "TAVUK DÖNER PORSİYON", price: 150.00, category: "ET - TAVUK" },
+            { id: 1006, name: "KÖFTE EKMEK", price: 130.00, category: "ET - TAVUK" },
+            { id: 1007, name: "KÖFTE PORSİYON", price: 150.00, category: "ET - TAVUK" },
+            { id: 1008, name: "KUZU ŞİŞ", price: 150.00, category: "ET - TAVUK" },
+            { id: 1009, name: "ADANA ŞİŞ", price: 150.00, category: "ET - TAVUK" },
+            { id: 1010, name: "PİRZOLA - 4 ADET", price: 250.00, category: "ET - TAVUK" },
+            { id: 1011, name: "TAVUK FAJİTA", price: 200.00, category: "ET - TAVUK" }, // Fiyat eklendi (önceki menüden)
+            { id: 1012, name: "TAVUK (PİLİÇ) ÇEVİRME", price: 250.00, category: "ET - TAVUK" },
+            { id: 1013, name: "ET DÖNER - KG", price: 1300.00, category: "ET - TAVUK" },
+            { id: 1014, name: "ET DÖNER - 500 GR", price: 650.00, category: "ET - TAVUK" },
+            { id: 1015, name: "TAVUK DÖNER - KG", price: 800.00, category: "ET - TAVUK" },
+            { id: 1016, name: "TAVUK DÖNER - 500 GR", price: 400.00, category: "ET - TAVUK" },
+            { id: 1017, name: "ÇITIR PİRZOLA (KELEBEK) KG PİŞMİŞ SERVİSLİ", price: 350.00, category: "ET - TAVUK" },
+            { id: 1018, name: "KANAT IZGARA KG PİŞMİŞ SERVİSLİ", price: 550.00, category: "ET - TAVUK" },
+            { id: 1019, name: "TAVUK PİRZOLA KG PİŞMİŞ SERVİSLİ", price: 530.00, category: "ET - TAVUK" },
+            { id: 1020, name: "CİĞER ŞİŞ 100 gr. (SERVİSLİ)", price: 80.00, category: "ET - TAVUK" },
+            { id: 1021, name: "TAVUK ŞİŞ (100 gr.) SERVİSLİ", price: 90.00, category: "ET - TAVUK" },
 
-            { id: 2001, name: "EKMEK ARASI ET DÖNER (80 GR)", price: 150.00, category: "ATIŞTIRMALIK" },
-            { id: 2002, name: "EKMEK ARASI KÖFTE (100 gr 5 adet)", price: 130.00, category: "ATIŞTIRMALIK" },
-            { id: 2003, name: "TAVUK DÖNER EKMEK ARASI (80 gr)", price: 130.00, category: "ATIŞTIRMALIK" },
-            { id: 2004, name: "PİZZA KARIŞIK (ORTA BOY)", price: 150.00, category: "ATIŞTIRMALIK" },
-            { id: 2005, name: "PİZZA KARIŞIK (BÜYÜK BOY)", price: 200.00, category: "ATIŞTIRMALIK" },
-            { id: 2006, name: "LAHMACUN", price: 75.00, category: "ATIŞTIRMALIK" },
-            { id: 2007, name: "PİDE ÇEŞİTLERİ", price: 100.00, category: "ATIŞTIRMALIK" },
-            { id: 2008, name: "AYVALIK TOSTU", price: 100.00, category: "ATIŞTIRMALIK" },
-            { id: 2009, name: "HAMBURGER", price: 120.00, category: "ATIŞTIRMALIK" },
-            { id: 2010, name: "ÇİĞ KÖFTE KG (MARUL-LİMON)", price: 300.00, category: "ATIŞTIRMALIK" },
-            { id: 2011, name: "KUMRU", price: 80.00, category: "ATIŞTIRMALIK" }, 
+            // ATIŞTIRMALIK Kategorisi
+            { id: 2001, name: "PİZZA KARIŞIK (ORTA BOY)", price: 150.00, category: "ATIŞTIRMALIK" },
+            { id: 2002, name: "PİZZA KARIŞIK (BÜYÜK BOY)", price: 200.00, category: "ATIŞTIRMALIK" },
+            { id: 2003, name: "LAHMACUN", price: 75.00, category: "ATIŞTIRMALIK" },
+            { id: 2004, name: "PİDE ÇEŞİTLERİ", price: 100.00, category: "ATIŞTIRMALIK" },
+            { id: 2005, name: "AYVALIK TOSTU", price: 100.00, category: "ATIŞTIRMALIK" },
+            { id: 2006, name: "HAMBURGER", price: 120.00, category: "ATIŞTIRMALIK" },
+            { id: 2007, name: "ÇİĞ KÖFTE KG (MARUL-LİMON)", price: 300.00, category: "ATIŞTIRMALIK" },
+            { id: 2008, name: "KUMRU", price: 80.00, category: "ATIŞTIRMALIK" }, 
 
+            // İÇECEK Kategorisi
             { id: 3001, name: "OSMANLI ŞERBETİ - 1 LİTRE", price: 75.00, category: "İÇECEK" },
             { id: 3002, name: "LİMONATA", price: 75.00, category: "İÇECEK" },
             { id: 3003, name: "SU", price: 10.00, category: "İÇECEK" },
@@ -567,6 +568,7 @@
             { id: 3008, name: "MEYVELİ MADEN SUYU", price: 15.00, category: "İÇECEK" },
             { id: 3009, name: "KUTU İÇECEKLER", price: 30.00, category: "İÇECEK" }, 
 
+            // TATLI Kategorisi
             { id: 4001, name: "EV BAKLAVASI - KG", price: 400.00, category: "TATLI" },
             { id: 4002, name: "EV BAKLAVASI - 500 GRAM", price: 200.00, category: "TATLI" },
             { id: 4003, name: "EV BAKLAVASI - PORSİYON", price: 75.00, category: "TATLI" },
@@ -580,9 +582,11 @@
             { id: 4011, name: "AŞURE - KG", price: 125.00, category: "TATLI" }, 
             { id: 4012, name: "HÖŞMERİM - KG", price: 110.00, category: "TATLI" }, 
 
+            // ÇORBA Kategorisi
             { id: 5001, name: "KELLE PAÇA ÇORBA", price: 60.00, category: "ÇORBA" },
             { id: 5002, name: "TARHANA ÇORBA", price: 60.00, category: "ÇORBA" },
             
+            // DİĞER Kategorisi
             { id: 6001, name: "PİŞMEMİŞ KASAP KÖFTE", price: 620.00, category: "DİĞER" },
             { id: 6002, name: "PİŞMEMİŞ İNEGÖL KÖFTE", price: 620.00, category: "DİĞER" },
             { id: 6003, name: "BÜYÜKBAŞ DANA KIYMA KG", price: 650.00, category: "DİĞER" },
@@ -614,7 +618,7 @@
     const salesReportButton = document.getElementById('salesReportButton'); 
     const quickSaleEntryButton = document.getElementById('quickSaleEntryButton'); 
     const quickSaleButtonContainerTop = document.getElementById('quickSaleButtonContainerTop'); 
-    const addProductToMenuButton = document.getElementById('addProductToMenuButton'); // YENİ
+    const addProductToMenuButton = document.getElementById('addProductToMenuButton'); 
     const tablesGrid = document.getElementById('tablesGrid');
     const productsListRef = document.getElementById('productsListRef');
     
@@ -845,7 +849,7 @@
                 if (message.payload && typeof message.payload === 'object' && userDataFromServer && typeof userDataFromServer === 'object') {
                     appState.user = userDataFromServer; 
                     appState.tables = message.payload.tables || []; 
-                    if (message.payload.products) { // Sunucudan ürün listesi geldiyse güncelle
+                    if (message.payload.products) { 
                         appState.products = message.payload.products;
                     }
                     if (appState.user && typeof appState.user.username !== 'undefined' && typeof appState.user.role !== 'undefined') {
@@ -903,13 +907,11 @@
                     console.log("[tables_update] Kullanıcı bilgisi (appState.user) henüz set edilmemiş, tables_update işlenmedi.");
                 }
                 break;
-            // YENİ: Sunucudan güncel ürün listesi geldiğinde
             case 'products_update':
                 if (message.payload && message.payload.products) {
                     appState.products = message.payload.products;
                     console.log("Ana ürün listesi sunucudan güncellendi.");
-                    renderInitialDataIfNeeded(); // Tüm ürün gösterimlerini yenile
-                    // Eğer bir sipariş ekranı açıksa onu da yenilemek gerekebilir (opsiyonel)
+                    renderInitialDataIfNeeded(); 
                     if (orderPageContainer.classList.contains('active') && appState.currentTableId) {
                         const currentTable = appState.tables.find(t => t.id === appState.currentTableId);
                         if (currentTable) renderOrderPageForTable(currentTable);
@@ -918,7 +920,6 @@
                 break;
             case 'main_menu_product_added':
                 alert(message.payload.message || "Yeni ürün menüye eklendi!");
-                // products_update mesajı zaten ürün listesini güncelleyecektir.
                 break;
             case 'sales_report_data':
                 appState.salesReport = message.payload.sales || [];
@@ -960,7 +961,7 @@
             manualProductSection.classList.remove('hidden');
             salesReportButton.classList.remove('hidden'); 
             quickSaleButtonContainerTop.classList.remove('hidden'); 
-            addProductToMenuButton.classList.remove('hidden'); // Yeni ürün ekleme butonunu göster
+            addProductToMenuButton.classList.remove('hidden'); 
             finalizeAndCloseTableButton.classList.remove('hidden'); 
             showReceiptButton.classList.remove('hidden'); 
             applyDiscountButton.classList.remove('hidden'); 
@@ -969,7 +970,7 @@
             manualProductSection.classList.add('hidden');
             salesReportButton.classList.add('hidden'); 
             quickSaleButtonContainerTop.classList.add('hidden'); 
-            addProductToMenuButton.classList.add('hidden'); // Yeni ürün ekleme butonunu gizle
+            addProductToMenuButton.classList.add('hidden'); 
             finalizeAndCloseTableButton.classList.add('hidden'); 
             showReceiptButton.classList.add('hidden'); 
             applyDiscountButton.classList.add('hidden'); 
@@ -980,12 +981,12 @@
     // Gerekliyse başlangıç render fonksiyonlarını çağırır
     let initialDataRendered = false;
     function renderInitialDataIfNeeded() {
-        if (!initialDataRendered || appState.products.length > 0) { // Ürünler yüklendiğinde render et
+        if (!initialDataRendered || appState.products.length > 0) { 
             renderProductGrid(orderPageProductGrid, false); 
             renderProductGrid(quickSaleProductGrid, true); 
             renderProductsForReference();
             populateManualCategorySelect(); 
-            populateNewProductCategorySelect(); // Yeni ürün modalı için kategori select'i doldur
+            populateNewProductCategorySelect(); 
             initialDataRendered = true;
             console.log("İlk data render edildi (ürün grid, referans, kategori select).");
         }
@@ -1263,7 +1264,7 @@
         });
     }
     
-    // YENİ: Yeni ürün ekleme modalı için kategori select'i doldurur
+    // Yeni ürün ekleme modalı için kategori select'i doldurur
     function populateNewProductCategorySelect() {
         newProductCategorySelect.innerHTML = '<option value="">Mevcut Kategori Seçin</option>';
         const categories = ["ET - TAVUK", "ATIŞTIRMALIK", "İÇECEK", "TATLI", "ÇORBA", "DİĞER"]; 
@@ -1820,9 +1821,9 @@
     logoutButton.addEventListener('click', handleLogout);
     salesReportButton.addEventListener('click', openSalesReport); 
     quickSaleEntryButton.addEventListener('click', openQuickSaleModal); 
-    addProductToMenuButton.addEventListener('click', openAddProductToMenuModal); // YENİ
-    closeAddProductToMenuModalButton.addEventListener('click', () => addProductToMenuModal.classList.remove('active')); // YENİ
-    saveNewProductButton.addEventListener('click', handleSaveNewProduct); // YENİ
+    addProductToMenuButton.addEventListener('click', openAddProductToMenuModal); 
+    closeAddProductToMenuModalButton.addEventListener('click', () => addProductToMenuModal.classList.remove('active')); 
+    saveNewProductButton.addEventListener('click', handleSaveNewProduct); 
 
     closeQuickSaleModalButton.addEventListener('click', () => { 
         quickSaleModal.classList.remove('active');
