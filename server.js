@@ -59,8 +59,7 @@ let users = [
     { id: 6, username: 'garson', password: 'gar.son', role: 'waiter' },
 ];
 
-// *** GÜNCELLENMİŞ ÜRÜN LİSTESİ (39 ÜRÜN) ***
-let products = [
+let products = [ 
     // ET - TAVUK Kategorisi
     { id: 1001, name: "İSKENDER - 120 GR", price: 275.00, category: "ET - TAVUK" },
     { id: 1002, name: "ET DÖNER EKMEK ARASI", price: 150.00, category: "ET - TAVUK" },
@@ -72,7 +71,7 @@ let products = [
     { id: 1008, name: "KUZU ŞİŞ", price: 150.00, category: "ET - TAVUK" },
     { id: 1009, name: "ADANA ŞİŞ", price: 150.00, category: "ET - TAVUK" },
     { id: 1010, name: "PİRZOLA - 4 ADET", price: 250.00, category: "ET - TAVUK" },
-    { id: 1011, name: "TAVUK FAJİTA", price: 0.00, category: "ET - TAVUK" }, // Fiyatı CSV'de boştu, 0.00 olarak ayarlandı. Lütfen güncelleyin.
+    { id: 1011, name: "TAVUK FAJİTA", price: 0.00, category: "ET - TAVUK" }, // Fiyatı CSV'de boştu
     { id: 1012, name: "TAVUK (PİLİÇ) ÇEVİRME", price: 250.00, category: "ET - TAVUK" },
     { id: 1013, name: "ET DÖNER - KG", price: 1300.00, category: "ET - TAVUK" },
     { id: 1014, name: "ET DÖNER - 500 GR", price: 650.00, category: "ET - TAVUK" },
@@ -106,12 +105,10 @@ let products = [
     { id: 5001, name: "KELLE PAÇA ÇORBA", price: 60.00, category: "ÇORBA" },
     { id: 5002, name: "TARHANA ÇORBA", price: 60.00, category: "ÇORBA" }
 ];
-// *** ÜRÜN LİSTESİ SONU ***
-
 
 let tables = []; 
 let completedOrders = []; 
-let nextTableId = 13; // Yeni masalar için başlangıç ID'si
+let nextTableId = 13; 
 
 function initializeTables(count = 12) {
     tables = [];
@@ -154,6 +151,21 @@ function broadcastProductsUpdate() {
     broadcast({ type: 'products_update', payload: { products: products } });
 }
 
+function broadcastWaitersList(requestingWs) {
+    const waiters = users.filter(u => u.role === 'waiter').map(u => ({ id: u.id, username: u.username }));
+    if (requestingWs) { // Sadece istek yapan kasaya gönder
+        requestingWs.send(JSON.stringify({ type: 'waiters_list', payload: { waiters: waiters } }));
+    } else { // Tüm kasalara yayınla (bir garson silindiğinde veya eklendiğinde)
+        clients.forEach((userInfo, clientSocket) => {
+            if (userInfo && userInfo.role === 'cashier' && clientSocket.readyState === WebSocket.OPEN) {
+                clientSocket.send(JSON.stringify({ type: 'waiters_list', payload: { waiters: waiters } }));
+            }
+        });
+    }
+}
+
+
+// Fiyatı hesaplamak için yardımcı fonksiyon
 function calculateTableTotal(order) {
     return order.reduce((sum, item) => {
         const price = item.priceAtOrder || 0; 
@@ -369,7 +381,7 @@ wss.on('connection', (ws) => {
                     ws.send(JSON.stringify({ type: 'error', payload: { message: 'Eksik ürün bilgisi.' } }));
                 }
                 break;
-            
+
             case 'add_table':
                 if (!currentUserInfo || currentUserInfo.role !== 'cashier') {
                     ws.send(JSON.stringify({ type: 'error', payload: { message: 'Bu işlem için yetkiniz yok.' } }));
@@ -437,6 +449,80 @@ wss.on('connection', (ws) => {
                     }
                 } else {
                     ws.send(JSON.stringify({ type: 'table_operation_fail', payload: { error: 'Eksik masa IDsi.' } }));
+                }
+                break;
+            
+            case 'get_waiters_list':
+                if (currentUserInfo && currentUserInfo.role === 'cashier') {
+                    broadcastWaitersList(ws); // Sadece istek yapan kasaya gönder
+                } else {
+                     ws.send(JSON.stringify({ type: 'error', payload: { message: 'Bu işlem için yetkiniz yok.' } }));
+                }
+                break;
+
+            case 'add_waiter':
+                if (!currentUserInfo || currentUserInfo.role !== 'cashier') {
+                    ws.send(JSON.stringify({ type: 'error', payload: { message: 'Bu işlem için yetkiniz yok.' } }));
+                    return;
+                }
+                if (payload && payload.username && payload.password) {
+                    if (users.find(u => u.username === payload.username)) {
+                        ws.send(JSON.stringify({ type: 'waiter_operation_fail', payload: { error: 'Bu kullanıcı adı zaten mevcut.' } }));
+                        return;
+                    }
+                    const maxUserId = users.reduce((max, u) => u.id > max ? u.id : max, 0);
+                    const newWaiter = {
+                        id: maxUserId + 1,
+                        username: payload.username,
+                        password: payload.password,
+                        role: 'waiter'
+                    };
+                    users.push(newWaiter);
+                    console.log(`Yeni garson eklendi: ${newWaiter.username}`);
+                    broadcastWaitersList(); // Tüm kasalara güncel listeyi gönder
+                    ws.send(JSON.stringify({ type: 'waiter_operation_success', payload: { message: `${newWaiter.username} adlı garson eklendi.` } }));
+                } else {
+                    ws.send(JSON.stringify({ type: 'waiter_operation_fail', payload: { error: 'Eksik garson bilgisi.' } }));
+                }
+                break;
+
+            case 'edit_waiter_password':
+                 if (!currentUserInfo || currentUserInfo.role !== 'cashier') {
+                    ws.send(JSON.stringify({ type: 'error', payload: { message: 'Bu işlem için yetkiniz yok.' } }));
+                    return;
+                }
+                if (payload && payload.userId && payload.newPassword) {
+                    const waiterToEdit = users.find(u => u.id === parseInt(payload.userId) && u.role === 'waiter');
+                    if (waiterToEdit) {
+                        waiterToEdit.password = payload.newPassword;
+                        console.log(`Garson şifresi güncellendi: ${waiterToEdit.username}`);
+                        ws.send(JSON.stringify({ type: 'waiter_operation_success', payload: { message: `${waiterToEdit.username} adlı garsonun şifresi güncellendi.` } }));
+                    } else {
+                        ws.send(JSON.stringify({ type: 'waiter_operation_fail', payload: { error: 'Düzenlenecek garson bulunamadı.' } }));
+                    }
+                } else {
+                    ws.send(JSON.stringify({ type: 'waiter_operation_fail', payload: { error: 'Eksik bilgi.' } }));
+                }
+                break;
+
+            case 'delete_waiter':
+                if (!currentUserInfo || currentUserInfo.role !== 'cashier') {
+                    ws.send(JSON.stringify({ type: 'error', payload: { message: 'Bu işlem için yetkiniz yok.' } }));
+                    return;
+                }
+                if (payload && payload.userId) {
+                    const waiterIndexToDelete = users.findIndex(u => u.id === parseInt(payload.userId) && u.role === 'waiter');
+                    if (waiterIndexToDelete > -1) {
+                        const deletedWaiterName = users[waiterIndexToDelete].username;
+                        users.splice(waiterIndexToDelete, 1);
+                        console.log(`Garson silindi: ${deletedWaiterName}`);
+                        broadcastWaitersList(); // Tüm kasalara güncel listeyi gönder
+                        ws.send(JSON.stringify({ type: 'waiter_operation_success', payload: { message: `${deletedWaiterName} adlı garson silindi.` } }));
+                    } else {
+                        ws.send(JSON.stringify({ type: 'waiter_operation_fail', payload: { error: 'Silinecek garson bulunamadı.' } }));
+                    }
+                } else {
+                    ws.send(JSON.stringify({ type: 'waiter_operation_fail', payload: { error: 'Eksik garson IDsi.' } }));
                 }
                 break;
 
