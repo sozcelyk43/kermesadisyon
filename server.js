@@ -71,7 +71,7 @@ let products = [
     { id: 1008, name: "KUZU ŞİŞ", price: 150.00, category: "ET - TAVUK" },
     { id: 1009, name: "ADANA ŞİŞ", price: 150.00, category: "ET - TAVUK" },
     { id: 1010, name: "PİRZOLA - 4 ADET", price: 250.00, category: "ET - TAVUK" },
-    { id: 1011, name: "TAVUK FAJİTA", price: 200.00, category: "ET - TAVUK" }, // Fiyatı CSV'de boştu
+    { id: 1011, name: "TAVUK FAJİTA", price: 200.00, category: "ET - TAVUK" }, 
     { id: 1012, name: "TAVUK (PİLİÇ) ÇEVİRME", price: 250.00, category: "ET - TAVUK" },
     { id: 1013, name: "ET DÖNER - KG", price: 1300.00, category: "ET - TAVUK" },
     { id: 1014, name: "ET DÖNER - 500 GR", price: 650.00, category: "ET - TAVUK" },
@@ -108,14 +108,16 @@ let products = [
 
 let tables = []; 
 let completedOrders = []; 
-let nextTableId = 13; 
+let nextTableIdCounter = 1; // Dinamik olarak eklenecek masalar için sayaç
 
-function initializeTables(count = 12) {
+function initializeTables() {
     tables = [];
-    for (let i = 1; i <= count; i++) {
+    // Kamelya Masaları
+    for (let i = 1; i <= 4; i++) {
         tables.push({
-            id: `masa-${i}`,
-            name: `Masa ${i}`,
+            id: `kamelya-${i}`, // Benzersiz ID
+            name: `Kamelya ${i}`,
+            type: 'kamelya', // Masa tipi eklendi
             status: "boş", 
             order: [], 
             total: 0,
@@ -123,6 +125,21 @@ function initializeTables(count = 12) {
             waiterUsername: null 
         });
     }
+    // Bahçe Masaları
+    for (let i = 1; i <= 16; i++) {
+        tables.push({
+            id: `bahce-${i}`, // Benzersiz ID
+            name: `Bahçe ${i}`,
+            type: 'bahce', // Masa tipi eklendi
+            status: "boş", 
+            order: [], 
+            total: 0,
+            waiterId: null, 
+            waiterUsername: null 
+        });
+    }
+    // nextTableIdCounter'ı mevcut masa sayısından sonra başlat
+    nextTableIdCounter = tables.length + 1; 
 }
 initializeTables(); 
 
@@ -153,9 +170,9 @@ function broadcastProductsUpdate() {
 
 function broadcastWaitersList(requestingWs) {
     const waiters = users.filter(u => u.role === 'waiter').map(u => ({ id: u.id, username: u.username }));
-    if (requestingWs) { // Sadece istek yapan kasaya gönder
+    if (requestingWs) { 
         requestingWs.send(JSON.stringify({ type: 'waiters_list', payload: { waiters: waiters } }));
-    } else { // Tüm kasalara yayınla (bir garson silindiğinde veya eklendiğinde)
+    } else { 
         clients.forEach((userInfo, clientSocket) => {
             if (userInfo && userInfo.role === 'cashier' && clientSocket.readyState === WebSocket.OPEN) {
                 clientSocket.send(JSON.stringify({ type: 'waiters_list', payload: { waiters: waiters } }));
@@ -389,8 +406,9 @@ wss.on('connection', (ws) => {
                 }
                 if (payload && payload.name && payload.name.trim() !== "") {
                     const newTable = {
-                        id: `masa-${nextTableId++}`,
+                        id: `masa-${nextTableIdCounter++}`, // Dinamik ID
                         name: payload.name.trim(),
+                        type: payload.type || 'bahce', // Varsayılan tip veya istemciden gelen
                         status: "boş",
                         order: [],
                         total: 0,
@@ -454,7 +472,7 @@ wss.on('connection', (ws) => {
             
             case 'get_waiters_list':
                 if (currentUserInfo && currentUserInfo.role === 'cashier') {
-                    broadcastWaitersList(ws); // Sadece istek yapan kasaya gönder
+                    broadcastWaitersList(ws); 
                 } else {
                      ws.send(JSON.stringify({ type: 'error', payload: { message: 'Bu işlem için yetkiniz yok.' } }));
                 }
@@ -479,7 +497,7 @@ wss.on('connection', (ws) => {
                     };
                     users.push(newWaiter);
                     console.log(`Yeni garson eklendi: ${newWaiter.username}`);
-                    broadcastWaitersList(); // Tüm kasalara güncel listeyi gönder
+                    broadcastWaitersList(); 
                     ws.send(JSON.stringify({ type: 'waiter_operation_success', payload: { message: `${newWaiter.username} adlı garson eklendi.` } }));
                 } else {
                     ws.send(JSON.stringify({ type: 'waiter_operation_fail', payload: { error: 'Eksik garson bilgisi.' } }));
@@ -516,7 +534,7 @@ wss.on('connection', (ws) => {
                         const deletedWaiterName = users[waiterIndexToDelete].username;
                         users.splice(waiterIndexToDelete, 1);
                         console.log(`Garson silindi: ${deletedWaiterName}`);
-                        broadcastWaitersList(); // Tüm kasalara güncel listeyi gönder
+                        broadcastWaitersList(); 
                         ws.send(JSON.stringify({ type: 'waiter_operation_success', payload: { message: `${deletedWaiterName} adlı garson silindi.` } }));
                     } else {
                         ws.send(JSON.stringify({ type: 'waiter_operation_fail', payload: { error: 'Silinecek garson bulunamadı.' } }));
