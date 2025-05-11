@@ -72,7 +72,7 @@ let products = [
     { id: 1008, name: "KUZU ŞİŞ", price: 150.00, category: "ET - TAVUK" },
     { id: 1009, name: "ADANA ŞİŞ", price: 150.00, category: "ET - TAVUK" },
     { id: 1010, name: "PİRZOLA - 4 ADET", price: 250.00, category: "ET - TAVUK" },
-    { id: 1011, name: "TAVUK FAJİTA", price: 0.00, category: "ET - TAVUK" }, // Fiyatı belirtilmemişti
+    { id: 1011, name: "TAVUK FAJİTA", price: 0.00, category: "ET - TAVUK" }, // Fiyatı CSV'de boştu, 0.00 olarak ayarlandı. Lütfen güncelleyin.
     { id: 1012, name: "TAVUK (PİLİÇ) ÇEVİRME", price: 250.00, category: "ET - TAVUK" },
     { id: 1013, name: "ET DÖNER - KG", price: 1300.00, category: "ET - TAVUK" },
     { id: 1014, name: "ET DÖNER - 500 GR", price: 650.00, category: "ET - TAVUK" },
@@ -92,7 +92,7 @@ let products = [
     { id: 3003, name: "SU", price: 10.00, category: "İÇECEK" },
     { id: 3004, name: "AYRAN", price: 15.00, category: "İÇECEK" },
     { id: 3005, name: "ÇAY", price: 10.00, category: "İÇECEK" },
-    { id: 3006, name: "GAZOZ", price: 25.00, category: "İÇECEK" }, // İÇEÇEK -> İÇECEK olarak düzeltildi
+    { id: 3006, name: "GAZOZ", price: 25.00, category: "İÇECEK" },
     // TATLI Kategorisi
     { id: 4001, name: "EV BAKLAVASI - KG", price: 400.00, category: "TATLI" },
     { id: 4002, name: "EV BAKLAVASI - 500 GRAM", price: 200.00, category: "TATLI" },
@@ -327,18 +327,40 @@ wss.on('connection', (ws) => {
                 }
                 if (payload && payload.name && payload.price >= 0 && payload.category) {
                     const maxId = products.reduce((max, p) => p.id > max ? p.id : max, 0);
-                    const newProductId = maxId < 7000 ? 7001 : maxId + 1; // ID'lerin çakışmaması için bir mantık
+                    const newProductId = maxId < 7000 ? 7001 : maxId + 1;
 
                     const newProduct = {
                         id: newProductId,
                         name: payload.name.toUpperCase(),
                         price: parseFloat(payload.price),
-                        category: payload.category.toUpperCase(), // Kategoriyi de büyük harf yapalım
+                        category: payload.category.toUpperCase(), 
                     };
                     products.push(newProduct);
                     console.log(`Yeni ürün ana menüye eklendi: ${newProduct.name}`);
-                    broadcastProductsUpdate(); // Tüm istemcilere güncel ürün listesini gönder
+                    broadcastProductsUpdate(); 
                     ws.send(JSON.stringify({ type: 'main_menu_product_added', payload: { product: newProduct, message: `${newProduct.name} menüye eklendi.` } })); 
+                } else {
+                    ws.send(JSON.stringify({ type: 'error', payload: { message: 'Eksik ürün bilgisi.' } }));
+                }
+                break;
+            
+            case 'update_main_menu_product':
+                if (!currentUserInfo || currentUserInfo.role !== 'cashier') {
+                    ws.send(JSON.stringify({ type: 'error', payload: { message: 'Bu işlem için yetkiniz yok.' } }));
+                    return;
+                }
+                if (payload && payload.id && payload.name && payload.price >= 0 && payload.category) {
+                    const productIndex = products.findIndex(p => p.id === parseInt(payload.id));
+                    if (productIndex > -1) {
+                        products[productIndex].name = payload.name.toUpperCase();
+                        products[productIndex].price = parseFloat(payload.price);
+                        products[productIndex].category = payload.category.toUpperCase();
+                        console.log(`Ürün güncellendi: ID ${payload.id} - ${products[productIndex].name}`);
+                        broadcastProductsUpdate();
+                        ws.send(JSON.stringify({ type: 'main_menu_product_updated', payload: { product: products[productIndex], message: `${products[productIndex].name} güncellendi.` } }));
+                    } else {
+                        ws.send(JSON.stringify({ type: 'error', payload: { message: 'Güncellenecek ürün bulunamadı.' } }));
+                    }
                 } else {
                     ws.send(JSON.stringify({ type: 'error', payload: { message: 'Eksik ürün bilgisi.' } }));
                 }
