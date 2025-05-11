@@ -17,13 +17,13 @@
         .modal.active {
             display: flex; 
         }
-        #orderPageContainer, #quickSaleModal, #addProductToMenuModal, #editProductModal { 
+        #orderPageContainer, #quickSaleModal, #addProductToMenuModal, #editProductModal, #manageTablesModal, #confirmDeleteTableModal { 
             display: none; 
         }
-        #orderPageContainer.active, #quickSaleModal.active, #addProductToMenuModal.active, #editProductModal.active {
+        #orderPageContainer.active, #quickSaleModal.active, #addProductToMenuModal.active, #editProductModal.active, #manageTablesModal.active, #confirmDeleteTableModal.active {
             display: block; 
         }
-        #quickSaleModal.active, #addProductToMenuModal.active, #editProductModal.active { 
+        #quickSaleModal.active, #addProductToMenuModal.active, #editProductModal.active, #manageTablesModal.active, #confirmDeleteTableModal.active { 
             position: fixed;
             inset: 0;
             background-color: rgba(0,0,0,0.75);
@@ -32,7 +32,7 @@
             z-index: 50; 
             padding: 1rem;
         }
-        #addProductToMenuModal.active .modal-content, #editProductModal.active .modal-content { 
+        #addProductToMenuModal.active .modal-content, #editProductModal.active .modal-content, #manageTablesModal.active .modal-content, #confirmDeleteTableModal.active .modal-content { 
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -199,7 +199,8 @@
             #confirmCloseTableModal button,
             #confirmDiscountModal button,
             #addProductToMenuModal button,
-            #editProductModal button /* Ürün düzenleme modalı butonları */
+            #editProductModal button,
+            #manageTablesModal button /* Masa yönetimi modalı butonları */
              {
                 display: none !important; 
             }
@@ -210,7 +211,8 @@
              #quickSaleButtonContainerTop, 
              #salesReportButton,
              #addProductToMenuButton,
-             #editProductMenuButton /* Ürün düzenleme butonu */
+             #editProductMenuButton,
+             #manageTablesButton /* Masa yönetimi ana butonu */
               { 
                 display: none !important;
              }
@@ -297,6 +299,7 @@
                 <p class="text-gray-600 mt-1">Aktif Kullanıcı: <span id="activeUserName" class="font-semibold"></span> (<span id="activeUserRole" class="capitalize"></span>)</p>
             </div>
             <div class="flex flex-wrap gap-2">
+                <button id="manageTablesButton" class="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2 px-4 rounded-md transition duration-150 hidden">Masa Yönetimi</button>
                 <button id="editProductMenuButton" class="bg-purple-500 hover:bg-purple-600 text-white font-semibold py-2 px-4 rounded-md transition duration-150 hidden">Ürün Düzenle</button>
                 <button id="addProductToMenuButton" class="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-2 px-4 rounded-md transition duration-150 hidden">Menüye Ürün Ekle</button>
                 <button id="salesReportButton" class="bg-teal-500 hover:bg-teal-600 text-white font-semibold py-2 px-4 rounded-md transition duration-150 hidden">Satış Raporu</button>
@@ -534,6 +537,52 @@
         </div>
     </div>
 
+    <div id="manageTablesModal" class="modal">
+        <div class="modal-content">
+            <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-2xl">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-semibold text-orange-600">Masa Yönetimi</h2>
+                    <button id="closeManageTablesModalButton" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="space-y-4 border-r md:pr-6">
+                        <h3 class="text-lg font-medium text-gray-700">Yeni Masa Ekle</h3>
+                        <input type="text" id="newTableNameInput" placeholder="Yeni Masa Adı (örn: Bahçe 1)" class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-500">
+                        <button id="addNewTableButton" class="w-full bg-green-500 hover:bg-green-600 text-white font-semibold p-3 rounded-md transition duration-150">Yeni Masa Ekle</button>
+                    </div>
+                    <div class="space-y-4 border-r md:pr-6">
+                        <h3 class="text-lg font-medium text-gray-700">Masa Adı Düzenle</h3>
+                        <select id="selectTableToEditName" class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-500">
+                            <option value="">Düzenlenecek Masayı Seçin</option>
+                        </select>
+                        <input type="text" id="editTableNameInput" placeholder="Yeni Masa Adı" class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-500">
+                        <button id="updateTableNameButton" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold p-3 rounded-md transition duration-150">Adı Güncelle</button>
+                    </div>
+                    <div class="space-y-4">
+                        <h3 class="text-lg font-medium text-gray-700">Masa Sil</h3>
+                        <select id="selectTableToDelete" class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-500">
+                            <option value="">Silinecek Masayı Seçin</option>
+                        </select>
+                        <button id="deleteTableButton" class="w-full bg-red-500 hover:bg-red-600 text-white font-semibold p-3 rounded-md transition duration-150">Masayı Sil</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="confirmDeleteTableModal" class="modal fixed inset-0 bg-gray-900 bg-opacity-75 items-center justify-center z-50">
+        <div class="modal-content">
+            <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-sm text-center">
+                <h2 class="text-xl font-semibold mb-4 text-red-600">Masayı Sil Onayı</h2>
+                <p class="text-gray-600 mb-6">"<span id="tableNameToDeleteSpan"></span>" adlı masayı silmek istediğinizden emin misiniz? Bu işlem geri alınamaz ve masadaki aktif siparişler (eğer varsa) kaybolacaktır.</p>
+                <div class="flex justify-center gap-4">
+                    <button id="confirmDeleteTableYesButton" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-6 rounded-md transition duration-150">Evet, Sil</button>
+                    <button id="confirmDeleteTableNoButton" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-6 rounded-md transition duration-150">Hayır, Vazgeç</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     <div id="salesReportModal" class="modal fixed inset-0 bg-gray-900 bg-opacity-75 items-center justify-center z-50">
         <div id="salesReportModalContent" class="bg-white p-6 md:p-8 rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col">
@@ -566,7 +615,6 @@
 
     const appState = {
         user: null, 
-        // GÜNCELLENMİŞ ÜRÜN LİSTESİ
         products: [ 
             // ET - TAVUK Kategorisi
             { id: 1001, name: "İSKENDER - 120 GR", price: 275.00, category: "ET - TAVUK" },
@@ -579,7 +627,7 @@
             { id: 1008, name: "KUZU ŞİŞ", price: 150.00, category: "ET - TAVUK" },
             { id: 1009, name: "ADANA ŞİŞ", price: 150.00, category: "ET - TAVUK" },
             { id: 1010, name: "PİRZOLA - 4 ADET", price: 250.00, category: "ET - TAVUK" },
-            { id: 1011, name: "TAVUK FAJİTA", price: 0.00, category: "ET - TAVUK" }, // Fiyatı CSV'de boştu, 0.00 olarak ayarlandı. Lütfen güncelleyin.
+            { id: 1011, name: "TAVUK FAJİTA", price: 0.00, category: "ET - TAVUK" }, 
             { id: 1012, name: "TAVUK (PİLİÇ) ÇEVİRME", price: 250.00, category: "ET - TAVUK" },
             { id: 1013, name: "ET DÖNER - KG", price: 1300.00, category: "ET - TAVUK" },
             { id: 1014, name: "ET DÖNER - 500 GR", price: 650.00, category: "ET - TAVUK" },
@@ -637,7 +685,8 @@
     const quickSaleEntryButton = document.getElementById('quickSaleEntryButton'); 
     const quickSaleButtonContainerTop = document.getElementById('quickSaleButtonContainerTop'); 
     const addProductToMenuButton = document.getElementById('addProductToMenuButton'); 
-    const editProductMenuButton = document.getElementById('editProductMenuButton'); // YENİ
+    const editProductMenuButton = document.getElementById('editProductMenuButton'); 
+    const manageTablesButton = document.getElementById('manageTablesButton'); // YENİ
     const tablesGrid = document.getElementById('tablesGrid');
     const productsListRef = document.getElementById('productsListRef');
     
@@ -714,6 +763,21 @@
     const editProductCategorySelect = document.getElementById('editProductCategory');
     const editProductCategoryInput = document.getElementById('editProductCategoryInput');
     const saveEditedProductButton = document.getElementById('saveEditedProductButton');
+
+    // Masa Yönetimi Modalı Elementleri
+    const manageTablesModal = document.getElementById('manageTablesModal');
+    const closeManageTablesModalButton = document.getElementById('closeManageTablesModalButton');
+    const newTableNameInput = document.getElementById('newTableNameInput');
+    const addNewTableButton = document.getElementById('addNewTableButton');
+    const selectTableToEditName = document.getElementById('selectTableToEditName');
+    const editTableNameInput = document.getElementById('editTableNameInput');
+    const updateTableNameButton = document.getElementById('updateTableNameButton');
+    const selectTableToDelete = document.getElementById('selectTableToDelete');
+    const deleteTableButton = document.getElementById('deleteTableButton');
+    const confirmDeleteTableModal = document.getElementById('confirmDeleteTableModal');
+    const tableNameToDeleteSpan = document.getElementById('tableNameToDeleteSpan');
+    const confirmDeleteTableYesButton = document.getElementById('confirmDeleteTableYesButton');
+    const confirmDeleteTableNoButton = document.getElementById('confirmDeleteTableNoButton');
 
 
     const salesReportModal = document.getElementById('salesReportModal');
@@ -934,6 +998,10 @@
                             showTablesView();
                         }
                     }
+                    // Masa yönetimi modalındaki select'leri de güncelle
+                    if (manageTablesModal.classList.contains('active')) {
+                        populateTableSelectsForManagement();
+                    }
                 } else {
                     console.log("[tables_update] Kullanıcı bilgisi (appState.user) henüz set edilmemiş, tables_update işlenmedi.");
                 }
@@ -942,7 +1010,7 @@
                 if (message.payload && message.payload.products) {
                     appState.products = message.payload.products;
                     console.log("Ana ürün listesi sunucudan güncellendi.");
-                    initialDataRendered = false; // Tekrar render edilmesi için
+                    initialDataRendered = false; 
                     renderInitialDataIfNeeded(); 
                     if (orderPageContainer.classList.contains('active') && appState.currentTableId) {
                         const currentTable = appState.tables.find(t => t.id === appState.currentTableId);
@@ -951,13 +1019,23 @@
                      if (quickSaleModal.classList.contains('active')) {
                         renderProductGrid(quickSaleProductGrid, true);
                     }
+                    // Ürün düzenleme modalındaki ürün listesini de güncelle
+                    if (editProductModal.classList.contains('active')) {
+                        populateSelectProductToEdit();
+                    }
                 }
                 break;
             case 'main_menu_product_added':
                 alert(message.payload.message || "Yeni ürün menüye eklendi!");
                 break;
-             case 'main_menu_product_updated': // YENİ
+             case 'main_menu_product_updated': 
                 alert(message.payload.message || "Ürün menüde güncellendi!");
+                break;
+            case 'table_operation_success': // YENİ: Masa yönetimi başarı mesajı
+                alert(message.payload.message || "Masa işlemi başarılı.");
+                break;
+            case 'table_operation_fail': // YENİ: Masa yönetimi hata mesajı
+                alert(message.payload.error || "Masa işlemi başarısız oldu.");
                 break;
             case 'sales_report_data':
                 appState.salesReport = message.payload.sales || [];
@@ -1000,7 +1078,8 @@
             salesReportButton.classList.remove('hidden'); 
             quickSaleButtonContainerTop.classList.remove('hidden'); 
             addProductToMenuButton.classList.remove('hidden'); 
-            editProductMenuButton.classList.remove('hidden'); // Ürün düzenle butonunu göster
+            editProductMenuButton.classList.remove('hidden'); 
+            manageTablesButton.classList.remove('hidden'); // Masa yönetimi butonunu göster
             finalizeAndCloseTableButton.classList.remove('hidden'); 
             showReceiptButton.classList.remove('hidden'); 
             applyDiscountButton.classList.remove('hidden'); 
@@ -1010,7 +1089,8 @@
             salesReportButton.classList.add('hidden'); 
             quickSaleButtonContainerTop.classList.add('hidden'); 
             addProductToMenuButton.classList.add('hidden'); 
-            editProductMenuButton.classList.add('hidden'); // Ürün düzenle butonunu gizle
+            editProductMenuButton.classList.add('hidden'); 
+            manageTablesButton.classList.add('hidden'); // Masa yönetimi butonunu gizle
             finalizeAndCloseTableButton.classList.add('hidden'); 
             showReceiptButton.classList.add('hidden'); 
             applyDiscountButton.classList.add('hidden'); 
@@ -1027,7 +1107,7 @@
             renderProductsForReference();
             populateManualCategorySelect(); 
             populateNewProductCategorySelect(); 
-            populateEditProductCategorySelect(); // Ürün düzenleme için kategori select'i doldur
+            populateEditProductCategorySelect(); 
             initialDataRendered = true;
             console.log("İlk data render edildi (ürün grid, referans, kategori select).");
         }
@@ -1326,7 +1406,7 @@
         });
     }
     
-    // YENİ: Ürün düzenleme modalı için kategori select'i doldurur
+    // Ürün düzenleme modalı için kategori select'i doldurur
     function populateEditProductCategorySelect() {
         editProductCategorySelect.innerHTML = '<option value="">Mevcut Kategori Seçin</option>';
         const categories = ["ET - TAVUK", "ATIŞTIRMALIK", "İÇECEK", "TATLI", "ÇORBA"]; 
@@ -1336,7 +1416,7 @@
             option.textContent = category;
             editProductCategorySelect.appendChild(option);
         });
-        editProductCategorySelect.innerHTML += '<option value="YENI_EDIT">** YENİ KATEGORİ **</option>'; // Farklı bir value yeni kategori için
+        editProductCategorySelect.innerHTML += '<option value="YENI_EDIT">** YENİ KATEGORİ **</option>'; 
         
         editProductCategorySelect.addEventListener('change', () => {
             if (editProductCategorySelect.value === 'YENI_EDIT') {
@@ -1876,18 +1956,18 @@
         addProductToMenuModal.classList.remove('active');
     }
     
-    // YENİ: Ürün Düzenleme Modalını Açma
+    // Ürün Düzenleme Modalını Açma
     function openEditProductModal() {
         if (appState.user && appState.user.role === 'cashier') {
             populateSelectProductToEdit();
-            editProductFormDiv.classList.add('hidden'); // Başlangıçta formu gizle
+            editProductFormDiv.classList.add('hidden'); 
             editProductModal.classList.add('active');
         } else {
             alert("Bu özelliği kullanma yetkiniz yok.");
         }
     }
 
-    // YENİ: Düzenlenecek ürünler için select'i doldurur
+    // Düzenlenecek ürünler için select'i doldurur
     function populateSelectProductToEdit() {
         selectProductToEdit.innerHTML = '<option value="">-- Ürün Seçin --</option>';
         appState.products.sort((a,b) => a.name.localeCompare(b, 'tr')).forEach(product => {
@@ -1898,7 +1978,7 @@
         });
     }
 
-    // YENİ: Seçilen ürünü düzenleme formuna yükler
+    // Seçilen ürünü düzenleme formuna yükler
     selectProductToEdit.addEventListener('change', () => {
         const productId = parseInt(selectProductToEdit.value);
         if (productId) {
@@ -1908,9 +1988,9 @@
                 editProductNameInput.value = product.name;
                 editProductPriceInput.value = product.price.toFixed(2);
                 
-                populateEditProductCategorySelect(); // Kategori select'i doldur
-                editProductCategorySelect.value = product.category; // Mevcut kategoriyi seç
-                if (!editProductCategorySelect.value) { // Eğer kategori listede yoksa (yeni eklenmiş olabilir)
+                populateEditProductCategorySelect(); 
+                editProductCategorySelect.value = product.category; 
+                if (!editProductCategorySelect.value) { 
                     editProductCategorySelect.value = "YENI_EDIT";
                     editProductCategoryInput.value = product.category;
                     editProductCategoryInput.classList.remove('hidden');
@@ -1925,7 +2005,7 @@
         }
     });
     
-    // YENİ: Düzenlenmiş ürünü kaydeder
+    // Düzenlenmiş ürünü kaydeder
     function handleSaveEditedProduct() {
         const productId = parseInt(editingProductIdInput.value);
         const name = editProductNameInput.value.trim();
@@ -1933,7 +2013,7 @@
         let category = editProductCategorySelect.value;
         const newCategoryName = editProductCategoryInput.value.trim().toUpperCase();
 
-        if (category === 'YENI_EDIT') { // Edit modalındaki yeni kategori için farklı value
+        if (category === 'YENI_EDIT') { 
             if (!newCategoryName) {
                 alert("Lütfen yeni kategori adını girin.");
                 return;
@@ -1955,6 +2035,79 @@
         editProductModal.classList.remove('active');
     }
 
+    // YENİ: Masa Yönetimi Modalını Açma/Kapama ve Doldurma
+    function openManageTablesModal() {
+        if (appState.user && appState.user.role === 'cashier') {
+            populateTableSelectsForManagement();
+            manageTablesModal.classList.add('active');
+        } else {
+            alert("Bu özelliği kullanma yetkiniz yok.");
+        }
+    }
+    function closeManageTablesModal() {
+        manageTablesModal.classList.remove('active');
+    }
+    function populateTableSelectsForManagement() {
+        selectTableToEditName.innerHTML = '<option value="">Düzenlenecek Masayı Seçin</option>';
+        selectTableToDelete.innerHTML = '<option value="">Silinecek Masayı Seçin</option>';
+        appState.tables.forEach(table => {
+            const optionEdit = document.createElement('option');
+            optionEdit.value = table.id;
+            optionEdit.textContent = table.name;
+            selectTableToEditName.appendChild(optionEdit);
+
+            const optionDelete = document.createElement('option');
+            optionDelete.value = table.id;
+            optionDelete.textContent = table.name;
+            selectTableToDelete.appendChild(optionDelete);
+        });
+        editTableNameInput.value = ''; // Düzenleme inputunu temizle
+    }
+
+    // YENİ: Yeni Masa Ekleme
+    function handleAddNewTable() {
+        const newName = newTableNameInput.value.trim();
+        if (!newName) {
+            alert("Lütfen yeni masa adı girin.");
+            return;
+        }
+        showLoading("Yeni masa ekleniyor...");
+        sendMessageToServer('add_table', { name: newName });
+        newTableNameInput.value = ''; // Input'u temizle
+        // Modal kapatma ve select güncelleme 'tables_update' ile olacak
+    }
+
+    // YENİ: Masa Adı Güncelleme
+    function handleUpdateTableName() {
+        const tableId = selectTableToEditName.value;
+        const newName = editTableNameInput.value.trim();
+        if (!tableId) {
+            alert("Lütfen düzenlenecek masayı seçin.");
+            return;
+        }
+        if (!newName) {
+            alert("Lütfen yeni masa adını girin.");
+            return;
+        }
+        showLoading("Masa adı güncelleniyor...");
+        sendMessageToServer('edit_table_name', { tableId: tableId, newName: newName });
+        // Modal kapatma ve select güncelleme 'tables_update' ile olacak
+    }
+
+    // YENİ: Masa Silme (Onay ile)
+    function handleDeleteTable() {
+        const tableId = selectTableToDelete.value;
+        if (!tableId) {
+            alert("Lütfen silinecek masayı seçin.");
+            return;
+        }
+        const table = appState.tables.find(t => t.id === tableId);
+        if (table) {
+            tableNameToDeleteSpan.textContent = table.name;
+            confirmDeleteTableModal.classList.add('active');
+        }
+    }
+
 
     // --- Event Listeners ---
     loginButton.addEventListener('click', handleLogin);
@@ -1965,11 +2118,27 @@
     salesReportButton.addEventListener('click', openSalesReport); 
     quickSaleEntryButton.addEventListener('click', openQuickSaleModal); 
     addProductToMenuButton.addEventListener('click', openAddProductToMenuModal); 
-    editProductMenuButton.addEventListener('click', openEditProductModal); // YENİ
+    editProductMenuButton.addEventListener('click', openEditProductModal); 
+    manageTablesButton.addEventListener('click', openManageTablesModal); // YENİ
     closeAddProductToMenuModalButton.addEventListener('click', () => addProductToMenuModal.classList.remove('active')); 
     saveNewProductButton.addEventListener('click', handleSaveNewProduct); 
-    closeEditProductModalButton.addEventListener('click', () => editProductModal.classList.remove('active')); // YENİ
-    saveEditedProductButton.addEventListener('click', handleSaveEditedProduct); // YENİ
+    closeEditProductModalButton.addEventListener('click', () => editProductModal.classList.remove('active')); 
+    saveEditedProductButton.addEventListener('click', handleSaveEditedProduct); 
+    closeManageTablesModalButton.addEventListener('click', closeManageTablesModal); // YENİ
+    addNewTableButton.addEventListener('click', handleAddNewTable); // YENİ
+    updateTableNameButton.addEventListener('click', handleUpdateTableName); // YENİ
+    deleteTableButton.addEventListener('click', handleDeleteTable); // YENİ
+    confirmDeleteTableYesButton.addEventListener('click', () => { // YENİ
+        const tableId = selectTableToDelete.value;
+        if (tableId) {
+            showLoading("Masa siliniyor...");
+            sendMessageToServer('delete_table', { tableId: tableId });
+        }
+        confirmDeleteTableModal.classList.remove('active');
+    });
+    confirmDeleteTableNoButton.addEventListener('click', () => { // YENİ
+        confirmDeleteTableModal.classList.remove('active');
+    });
 
 
     closeQuickSaleModalButton.addEventListener('click', () => { 
