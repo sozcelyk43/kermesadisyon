@@ -309,11 +309,11 @@
             </div>
             <div class="flex flex-wrap gap-2">
                 <button id="manageWaitersButton" class="bg-pink-500 hover:bg-pink-600 text-white font-semibold py-2 px-4 rounded-md transition duration-150 hidden">Garson Yönetimi</button>
-                <button id="manageTablesButton" class="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2 px-4 rounded-md transition duration-150 hidden">Masa Yönetimi</button>
-                <button id="editProductMenuButton" class="bg-purple-500 hover:bg-purple-600 text-white font-semibold py-2 px-4 rounded-md transition duration-150 hidden">Ürün Düzenle</button>
+                <button id="manageTablesButton" class="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2 px-4 rounded-md transition duration-150 hidden">Masalar Yönetimi</button>
+                <button id="editProductMenuButton" class="bg-purple-500 hover:bg-purple-600 text-white font-semibold py-2 px-4 rounded-md transition duration-150 hidden">Ürün Düzenleme</button>
                 <button id="addProductToMenuButton" class="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-2 px-4 rounded-md transition duration-150 hidden">Menüye Ürün Ekle</button>
-                <button id="salesReportButton" class="bg-teal-500 hover:bg-teal-600 text-white font-semibold py-2 px-4 rounded-md transition duration-150 hidden">Satış Raporu</button>
-                <button id="logoutButton" class="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-md transition duration-150">Çıkış Yap</button>
+                <button id="salesReportButton" class="bg-teal-500 hover:bg-teal-600 text-white font-semibold py-2 px-4 rounded-md transition duration-150 hidden">Satış Raporlama</button>
+                <button id="logoutButton" class="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-md transition duration-150">Uygulamadan Çık</button>
             </div>
         </header>
 
@@ -551,7 +551,7 @@
         <div class="modal-content">
             <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-2xl">
                 <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-xl font-semibold text-orange-600">Masa Yönetimi</h2>
+                    <h2 class="text-xl font-semibold text-orange-600">Masalar Yönetimi</h2>
                     <button id="closeManageTablesModalButton" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -685,7 +685,7 @@
             { id: 1008, name: "KUZU ŞİŞ", price: 150.00, category: "ET - TAVUK" },
             { id: 1009, name: "ADANA ŞİŞ", price: 150.00, category: "ET - TAVUK" },
             { id: 1010, name: "PİRZOLA - 4 ADET", price: 250.00, category: "ET - TAVUK" },
-            { id: 1011, name: "TAVUK FAJİTA", price: 200.00, category: "ET - TAVUK" }, // Fiyatı CSV'de boştu
+            { id: 1011, name: "TAVUK FAJİTA", price: 200.00, category: "ET - TAVUK" }, 
             { id: 1012, name: "TAVUK (PİLİÇ) ÇEVİRME", price: 250.00, category: "ET - TAVUK" },
             { id: 1013, name: "ET DÖNER - KG", price: 1300.00, category: "ET - TAVUK" },
             { id: 1014, name: "ET DÖNER - 500 GR", price: 650.00, category: "ET - TAVUK" },
@@ -705,7 +705,7 @@
             { id: 3003, name: "SU", price: 10.00, category: "İÇECEK" },
             { id: 3004, name: "AYRAN", price: 15.00, category: "İÇECEK" },
             { id: 3005, name: "ÇAY", price: 10.00, category: "İÇECEK" },
-            { id: 3006, name: "GAZOZ", price: 25.00, category: "İÇECEK" },
+            { id: 3006, name: "GAZOZ", price: 25.00, category: "İÇECEK" }, 
             // TATLI Kategorisi
             { id: 4001, name: "EV BAKLAVASI - KG", price: 400.00, category: "TATLI" },
             { id: 4002, name: "EV BAKLAVASI - 500 GRAM", price: 200.00, category: "TATLI" },
@@ -1162,6 +1162,7 @@
         
         if (appState.user.role === 'cashier') {
             manualProductSection.classList.remove('hidden');
+            salesReportButton.textContent = "Satış Raporlama"; // Buton adı güncelleme
             salesReportButton.classList.remove('hidden'); 
             quickSaleButtonContainerTop.classList.remove('hidden'); 
             addProductToMenuButton.classList.remove('hidden'); 
@@ -1185,6 +1186,7 @@
             applyDiscountButton.classList.add('hidden'); 
             applyQuickSaleDiscountButton.classList.add('hidden');
         }
+        logoutButton.textContent = "Uygulamadan Çık"; // Herkes için
     }
     
     // Gerekliyse başlangıç render fonksiyonlarını çağırır
