@@ -111,6 +111,7 @@ let products = [
 
 let tables = []; 
 let completedOrders = []; 
+let nextTableId = 13; // Yeni masalar için başlangıç ID'si
 
 function initializeTables(count = 12) {
     tables = [];
@@ -149,12 +150,10 @@ function broadcastTableUpdates() {
     broadcast({ type: 'tables_update', payload: { tables: tables } });
 }
 
-// Tüm bağlı istemcilere güncellenmiş ürün listesini gönderir
 function broadcastProductsUpdate() {
     broadcast({ type: 'products_update', payload: { products: products } });
 }
 
-// Fiyatı hesaplamak için yardımcı fonksiyon
 function calculateTableTotal(order) {
     return order.reduce((sum, item) => {
         const price = item.priceAtOrder || 0; 
@@ -234,7 +233,7 @@ wss.on('connection', (ws) => {
                  }
                 break;
             
-            case 'get_products': // menu.html için
+            case 'get_products': 
                 console.log("[get_products] İstek alındı, ürün listesi gönderiliyor.");
                 ws.send(JSON.stringify({ type: 'products_update', payload: { products: products } }));
                 break;
@@ -368,6 +367,76 @@ wss.on('connection', (ws) => {
                     }
                 } else {
                     ws.send(JSON.stringify({ type: 'error', payload: { message: 'Eksik ürün bilgisi.' } }));
+                }
+                break;
+            
+            case 'add_table':
+                if (!currentUserInfo || currentUserInfo.role !== 'cashier') {
+                    ws.send(JSON.stringify({ type: 'error', payload: { message: 'Bu işlem için yetkiniz yok.' } }));
+                    return;
+                }
+                if (payload && payload.name && payload.name.trim() !== "") {
+                    const newTable = {
+                        id: `masa-${nextTableId++}`,
+                        name: payload.name.trim(),
+                        status: "boş",
+                        order: [],
+                        total: 0,
+                        waiterId: null,
+                        waiterUsername: null
+                    };
+                    tables.push(newTable);
+                    console.log(`Yeni masa eklendi: ${newTable.name}`);
+                    broadcastTableUpdates();
+                    ws.send(JSON.stringify({ type: 'table_operation_success', payload: { message: `${newTable.name} eklendi.` } }));
+                } else {
+                    ws.send(JSON.stringify({ type: 'table_operation_fail', payload: { error: 'Geçersiz masa adı.' } }));
+                }
+                break;
+
+            case 'edit_table_name':
+                if (!currentUserInfo || currentUserInfo.role !== 'cashier') {
+                    ws.send(JSON.stringify({ type: 'error', payload: { message: 'Bu işlem için yetkiniz yok.' } }));
+                    return;
+                }
+                if (payload && payload.tableId && payload.newName && payload.newName.trim() !== "") {
+                    const tableToEdit = tables.find(t => t.id === payload.tableId);
+                    if (tableToEdit) {
+                        tableToEdit.name = payload.newName.trim();
+                        console.log(`Masa adı güncellendi: ${tableToEdit.id} -> ${tableToEdit.name}`);
+                        broadcastTableUpdates();
+                        ws.send(JSON.stringify({ type: 'table_operation_success', payload: { message: `Masa adı ${tableToEdit.name} olarak güncellendi.` } }));
+                    } else {
+                        ws.send(JSON.stringify({ type: 'table_operation_fail', payload: { error: 'Düzenlenecek masa bulunamadı.' } }));
+                    }
+                } else {
+                    ws.send(JSON.stringify({ type: 'table_operation_fail', payload: { error: 'Eksik veya geçersiz bilgi.' } }));
+                }
+                break;
+
+            case 'delete_table':
+                if (!currentUserInfo || currentUserInfo.role !== 'cashier') {
+                    ws.send(JSON.stringify({ type: 'error', payload: { message: 'Bu işlem için yetkiniz yok.' } }));
+                    return;
+                }
+                if (payload && payload.tableId) {
+                    const tableIndexToDelete = tables.findIndex(t => t.id === payload.tableId);
+                    if (tableIndexToDelete > -1) {
+                        const tableToDelete = tables[tableIndexToDelete];
+                        if (tableToDelete.status === 'dolu' && tableToDelete.order.length > 0) {
+                            ws.send(JSON.stringify({ type: 'table_operation_fail', payload: { error: `"${tableToDelete.name}" dolu olduğu için silinemez. Önce hesabı kapatın.` } }));
+                            return;
+                        }
+                        const deletedTableName = tableToDelete.name;
+                        tables.splice(tableIndexToDelete, 1);
+                        console.log(`Masa silindi: ${deletedTableName} (ID: ${payload.tableId})`);
+                        broadcastTableUpdates();
+                        ws.send(JSON.stringify({ type: 'table_operation_success', payload: { message: `"${deletedTableName}" başarıyla silindi.` } }));
+                    } else {
+                        ws.send(JSON.stringify({ type: 'table_operation_fail', payload: { error: 'Silinecek masa bulunamadı.' } }));
+                    }
+                } else {
+                    ws.send(JSON.stringify({ type: 'table_operation_fail', payload: { error: 'Eksik masa IDsi.' } }));
                 }
                 break;
 
