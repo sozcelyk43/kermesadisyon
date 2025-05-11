@@ -5,7 +5,7 @@ const http = require('http');
 const path = require('path');     
 
 // --- Sunucu Ayarları ---
-const HTTP_PORT = process.env.PORT || 8080; // Render veya yerel için port
+const HTTP_PORT = process.env.PORT || 8080; 
 
 // --- Express Uygulaması ve HTTP Sunucusu ---
 const app = express();
@@ -232,6 +232,11 @@ wss.on('connection', (ws) => {
                      console.log("[reauthenticate] Eksik kullanıcı bilgisi.");
                      ws.send(JSON.stringify({ type: 'error', payload: { message: 'Eksik oturum bilgisi.' } }));
                  }
+                break;
+            
+            case 'get_products': // menu.html için
+                console.log("[get_products] İstek alındı, ürün listesi gönderiliyor.");
+                ws.send(JSON.stringify({ type: 'products_update', payload: { products: products } }));
                 break;
 
             case 'add_order_item':
