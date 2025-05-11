@@ -71,7 +71,7 @@ let products = [
     { id: 1008, name: "KUZU ŞİŞ", price: 150.00, category: "ET - TAVUK" },
     { id: 1009, name: "ADANA ŞİŞ", price: 150.00, category: "ET - TAVUK" },
     { id: 1010, name: "PİRZOLA - 4 ADET", price: 250.00, category: "ET - TAVUK" },
-    { id: 1011, name: "TAVUK FAJİTA", price: 200.00, category: "ET - TAVUK" }, 
+    { id: 1011, name: "TAVUK FAJİTA", price: 200.00, category: "ET - TAVUK" }, // Fiyat güncellendi
     { id: 1012, name: "TAVUK (PİLİÇ) ÇEVİRME", price: 250.00, category: "ET - TAVUK" },
     { id: 1013, name: "ET DÖNER - KG", price: 1300.00, category: "ET - TAVUK" },
     { id: 1014, name: "ET DÖNER - 500 GR", price: 650.00, category: "ET - TAVUK" },
@@ -106,18 +106,21 @@ let products = [
     { id: 5002, name: "TARHANA ÇORBA", price: 60.00, category: "ÇORBA" }
 ];
 
+
 let tables = []; 
 let completedOrders = []; 
-let nextTableIdCounter = 1; // Dinamik olarak eklenecek masalar için sayaç
+let nextTableIdCounter = 1; // Yeni masa ekleme için kullanılacak ID sayacı
 
 function initializeTables() {
     tables = [];
+    let currentId = 1; // Masa ID'lerini sıralı vermek için
+
     // Kamelya Masaları
-    for (let i = 1; i <= 4; i++) {
+    for (let i = 1; i <= 5; i++) {
         tables.push({
-            id: `kamelya-${i}`, // Benzersiz ID
+            id: `masa-${currentId++}`, 
             name: `Kamelya ${i}`,
-            type: 'kamelya', // Masa tipi eklendi
+            type: 'kamelya', 
             status: "boş", 
             order: [], 
             total: 0,
@@ -128,9 +131,9 @@ function initializeTables() {
     // Bahçe Masaları
     for (let i = 1; i <= 16; i++) {
         tables.push({
-            id: `bahce-${i}`, // Benzersiz ID
+            id: `masa-${currentId++}`, 
             name: `Bahçe ${i}`,
-            type: 'bahce', // Masa tipi eklendi
+            type: 'bahce', 
             status: "boş", 
             order: [], 
             total: 0,
@@ -138,8 +141,8 @@ function initializeTables() {
             waiterUsername: null 
         });
     }
-    // nextTableIdCounter'ı mevcut masa sayısından sonra başlat
-    nextTableIdCounter = tables.length + 1; 
+    nextTableIdCounter = currentId; // Bir sonraki eklenecek masa için ID'yi ayarla
+    console.log(`${tables.length} masa oluşturuldu. Bir sonraki masa ID'si: ${nextTableIdCounter}`);
 }
 initializeTables(); 
 
@@ -406,9 +409,9 @@ wss.on('connection', (ws) => {
                 }
                 if (payload && payload.name && payload.name.trim() !== "") {
                     const newTable = {
-                        id: `masa-${nextTableIdCounter++}`, // Dinamik ID
+                        id: `masa-${nextTableIdCounter++}`, 
                         name: payload.name.trim(),
-                        type: payload.type || 'bahce', // Varsayılan tip veya istemciden gelen
+                        type: payload.type || 'bahce', // Varsayılan tip 'bahce' veya istemciden gelen
                         status: "boş",
                         order: [],
                         total: 0,
