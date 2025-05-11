@@ -9,43 +9,43 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f9fafb; /* Biraz daha açık gri arka plan */
+            background-color: #f9fafb; 
         }
-        /* Kategori Alanı Stilleri */
         .category-section {
-             border: 1px solid #e5e7eb; /* Daha açık kenarlık */
+             border: 1px solid #e5e7eb; 
              transition: box-shadow 0.3s ease-in-out;
         }
          .category-section:hover {
-             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* Hafif hover gölgesi */
+             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); 
          }
-
-        /* Kategori Renkleri (Arka Plan) */
         .category-bg-ET-TAVUK { background-color: #fee2e2; border-left: 4px solid #f87171; } 
         .category-bg-ATIŞTIRMALIK { background-color: #ffedd5; border-left: 4px solid #fb923c; } 
         .category-bg-TATLI { background-color: #fce7f3; border-left: 4px solid #f472b6; } 
         .category-bg-İÇECEK { background-color: #eff6ff; border-left: 4px solid #60a5fa; } 
         .category-bg-ÇORBA { background-color: #fef9c3; border-left: 4px solid #facc15; } 
         .category-bg-default { background-color: #f3f4f6; border-left: 4px solid #9ca3af; } 
-
-         /* Kategori Başlık Stili */
          .category-title {
              display: flex;
              align-items: center;
-             gap: 0.75rem; /* İkon ve yazı arası boşluk artırıldı */
+             gap: 0.75rem; 
          }
-         .category-title .icon-container { /* İkon için kapsayıcı */
-            font-size: 1.5rem; /* Emoji boyutunu ayarlar */
+         .category-title .icon-container { 
+            font-size: 1.5rem; 
             line-height: 1;
          }
-         /* Menü Öğesi Stili */
-         .menu-item span:first-child { /* Ürün adı */
-             color: #374151; /* gray-700 */
+         .menu-item span:first-child { 
+             color: #374151; 
          }
-         .menu-item span:last-child { /* Fiyat */
-             color: #111827; /* gray-900 */
-             font-weight: 500; /* Medium font ağırlığı */
+         .menu-item span:last-child { 
+             color: #111827; 
+             font-weight: 500; 
          }
+         #loadingMenuMessage.active {
+            display: flex;
+        }
+        #loadingMenuMessage {
+            display: none;
+        }
     </style>
 </head>
 <body class="bg-gray-50">
@@ -55,63 +55,25 @@
             <h2 class="text-2xl font-semibold text-gray-700">MENÜ</h2>
         </header>
 
-        <div id="menuContainer" class="space-y-8"> 
-            </div>
+        <div id="loadingMenuMessage" class="fixed inset-0 bg-gray-900 bg-opacity-50 items-center justify-center z-50">
+            <p class="text-white text-xl">Menü yükleniyor...</p>
+        </div>
 
+        <div id="menuContainer" class="space-y-8"> 
+            <p class="text-center text-gray-500">Menü bilgisi bekleniyor...</p>
+        </div>
     </div>
 
 <script>
-    // GÜNCELLENMİŞ ÜRÜN LİSTESİ (39 ÜRÜN)
-    const products = [ 
-        // ET - TAVUK Kategorisi
-        { id: 1001, name: "İSKENDER - 120 GR", price: 275.00, category: "ET - TAVUK" },
-        { id: 1002, name: "ET DÖNER EKMEK ARASI", price: 150.00, category: "ET - TAVUK" },
-        { id: 1003, name: "ET DÖNER PORSİYON", price: 175.00, category: "ET - TAVUK" },
-        { id: 1004, name: "TAVUK DÖNER EKMEK ARASI", price: 130.00, category: "ET - TAVUK" },
-        { id: 1005, name: "TAVUK DÖNER PORSİYON", price: 150.00, category: "ET - TAVUK" },
-        { id: 1006, name: "KÖFTE EKMEK", price: 130.00, category: "ET - TAVUK" },
-        { id: 1007, name: "KÖFTE PORSİYON", price: 150.00, category: "ET - TAVUK" },
-        { id: 1008, name: "KUZU ŞİŞ", price: 150.00, category: "ET - TAVUK" },
-        { id: 1009, name: "ADANA ŞİŞ", price: 150.00, category: "ET - TAVUK" },
-        { id: 1010, name: "PİRZOLA - 4 ADET", price: 250.00, category: "ET - TAVUK" },
-        { id: 1011, name: "TAVUK FAJİTA", price: 0.00, category: "ET - TAVUK" }, // Fiyatı belirtilmemişti, 0.00 olarak ayarlandı
-        { id: 1012, name: "TAVUK (PİLİÇ) ÇEVİRME", price: 250.00, category: "ET - TAVUK" },
-        { id: 1013, name: "ET DÖNER - KG", price: 1300.00, category: "ET - TAVUK" },
-        { id: 1014, name: "ET DÖNER - 500 GR", price: 650.00, category: "ET - TAVUK" },
-        { id: 1015, name: "TAVUK DÖNER - KG", price: 800.00, category: "ET - TAVUK" },
-        { id: 1016, name: "TAVUK DÖNER - 500 GR", price: 400.00, category: "ET - TAVUK" },
-        // ATIŞTIRMALIK Kategorisi
-        { id: 2001, name: "PİZZA KARIŞIK (ORTA BOY)", price: 150.00, category: "ATIŞTIRMALIK" },
-        { id: 2002, name: "PİZZA KARIŞIK (BÜYÜK BOY)", price: 200.00, category: "ATIŞTIRMALIK" },
-        { id: 2003, name: "LAHMACUN", price: 75.00, category: "ATIŞTIRMALIK" },
-        { id: 2004, name: "PİDE ÇEŞİTLERİ", price: 100.00, category: "ATIŞTIRMALIK" },
-        { id: 2005, name: "AYVALIK TOSTU", price: 100.00, category: "ATIŞTIRMALIK" },
-        { id: 2006, name: "HAMBURGER", price: 120.00, category: "ATIŞTIRMALIK" },
-        { id: 2007, name: "ÇİĞ KÖFTE KG (MARUL-LİMON)", price: 300.00, category: "ATIŞTIRMALIK" },
-        // İÇECEK Kategorisi
-        { id: 3001, name: "OSMANLI ŞERBETİ - 1 LİTRE", price: 75.00, category: "İÇECEK" },
-        { id: 3002, name: "LİMONATA", price: 75.00, category: "İÇECEK" },
-        { id: 3003, name: "SU", price: 10.00, category: "İÇECEK" },
-        { id: 3004, name: "AYRAN", price: 15.00, category: "İÇECEK" },
-        { id: 3005, name: "ÇAY", price: 10.00, category: "İÇECEK" },
-        { id: 3006, name: "GAZOZ", price: 25.00, category: "İÇECEK" },
-        // TATLI Kategorisi
-        { id: 4001, name: "EV BAKLAVASI - KG", price: 400.00, category: "TATLI" },
-        { id: 4002, name: "EV BAKLAVASI - 500 GRAM", price: 200.00, category: "TATLI" },
-        { id: 4003, name: "EV BAKLAVASI - PORSİYON", price: 75.00, category: "TATLI" },
-        { id: 4004, name: "AŞURE - 500 GRAM", price: 100.00, category: "TATLI" },
-        { id: 4005, name: "HÖŞMERİM - 500 GRAM", price: 100.00, category: "TATLI" },
-        { id: 4006, name: "DİĞER PASTA ÇEŞİTLERİ", price: 50.00, category: "TATLI" },
-        { id: 4007, name: "YAĞLI GÖZLEME", price: 50.00, category: "TATLI" },
-        { id: 4008, name: "İÇLİ GÖZLEME", price: 60.00, category: "TATLI" },
-        // ÇORBA Kategorisi
-        { id: 5001, name: "KELLE PAÇA ÇORBA", price: 60.00, category: "ÇORBA" },
-        { id: 5002, name: "TARHANA ÇORBA", price: 60.00, category: "ÇORBA" }
-    ];
+    // Render'daki uygulamanızın adını buraya yazın
+    const APP_NAME = "emet-adisyon"; // Örneğin: "emet-adisyon"
+    const WEBSOCKET_URL_MENU = `wss://${APP_NAME}.onrender.com`; 
+    let menuSocket;
+    let localProducts = []; // Sunucudan gelen ürünleri saklamak için
 
     const menuContainer = document.getElementById('menuContainer');
+    const loadingMenuMessage = document.getElementById('loadingMenuMessage');
 
-    // Fiyat formatlama fonksiyonu
     function formatPrice(price) {
         if (typeof price !== 'number' || isNaN(price)) {
             return '0 ₺'; 
@@ -123,7 +85,6 @@
         return formatted + ' ₺';
     }
 
-     // Kategori adı için CSS sınıfı üreten fonksiyon
     function sanitizeCategoryForCSS(categoryName) {
         if (!categoryName) return 'default';
         const turkishMap = { 'İ': 'I', 'ı': 'i', 'Ö': 'O', 'ö': 'o', 'Ü': 'U', 'ü': 'u', 'Ş': 'S', 'ş': 's', 'Ğ': 'G', 'ğ': 'g', 'Ç': 'C', 'ç': 'c' };
@@ -135,46 +96,47 @@
             .toUpperCase(); 
     }
     
-    // Kategori ikonları (Emoji olarak güncellendi)
     const categoryIcons = {
         "ÇORBA": "🍲",
         "ET - TAVUK": "🥩", 
         "ATIŞTIRMALIK": "🥨", 
         "İÇECEK": "🥤",
         "TATLI": "🍰"
-        // "DİĞER" kategorisi menüden kaldırıldığı için ikonu da kaldırıldı.
     };
-    const defaultIcon = "🍽️"; // Genel bir yemek ikonu
+    const defaultIcon = "🍽️"; 
 
     function renderMenu() {
+        console.log("renderMenu çağrıldı, ürün sayısı:", localProducts.length);
         menuContainer.innerHTML = ''; 
+        if (localProducts.length === 0) {
+            menuContainer.innerHTML = '<p class="text-center text-gray-500">Menüde henüz ürün bulunmuyor.</p>';
+            return;
+        }
+
         const categories = {};
-         const categoryColors = { 
+        const categoryColors = { 
             "ET - TAVUK": "category-bg-ET-TAVUK",
             "ATIŞTIRMALIK": "category-bg-ATIŞTIRMALIK",
             "TATLI": "category-bg-TATLI",
             "İÇECEK": "category-bg-İÇECEK",
             "ÇORBA": "category-bg-ÇORBA",
-            // "DİĞER" kaldırıldı
         };
         const defaultColor = "category-bg-default";
 
-        products.forEach(product => {
-            const categoryKey = product.category; // Artık tüm ürünlerin kategorisi olmalı
+        localProducts.forEach(product => {
+            const categoryKey = product.category; 
             if (!categories[categoryKey]) {
                 categories[categoryKey] = [];
             }
             categories[categoryKey].push(product);
         });
 
-        const categoryOrder = ["ÇORBA", "ET - TAVUK", "ATIŞTIRMALIK", "İÇECEK", "TATLI"]; // "DİĞER" kaldırıldı
+        const categoryOrder = ["ÇORBA", "ET - TAVUK", "ATIŞTIRMALIK", "İÇECEK", "TATLI"];
         
-        sortedCategories = categoryOrder.filter(cat => categories[cat]); // Sadece ürün içeren kategorileri al
+        const sortedCategories = categoryOrder.filter(cat => categories[cat]); 
 
         sortedCategories.forEach(category => {
             const categorySection = document.createElement('div');
-            // Sanitize edilmiş kategori adını CSS sınıfı için kullan
-            const sanitizedCategoryName = sanitizeCategoryForCSS(category);
             const bgColorClass = categoryColors[category] || defaultColor;
             categorySection.className = `category-section mb-6 p-4 rounded-lg shadow-md ${bgColorClass}`; 
 
@@ -202,7 +164,53 @@
         });
     }
 
-    document.addEventListener('DOMContentLoaded', renderMenu);
+    function connectMenuWebSocket() {
+        loadingMenuMessage.classList.add('active');
+        menuSocket = new WebSocket(WEBSOCKET_URL_MENU);
+
+        menuSocket.onopen = () => {
+            console.log("Menü WebSocket bağlantısı kuruldu.");
+            // Sunucudan güncel ürün listesini iste
+            menuSocket.send(JSON.stringify({ type: 'get_products' }));
+        };
+
+        menuSocket.onmessage = (event) => {
+            console.log("Menü WS'den mesaj alındı:", event.data);
+            let message;
+            try {
+                message = JSON.parse(event.data);
+            } catch (error) {
+                console.error("Menü WS JSON.parse hatası:", error);
+                return;
+            }
+
+            if (message.type === 'products_update' && message.payload && message.payload.products) {
+                localProducts = message.payload.products;
+                console.log("Menü ürünleri güncellendi:", localProducts);
+                renderMenu();
+                loadingMenuMessage.classList.remove('active');
+            }
+        };
+
+        menuSocket.onerror = (error) => {
+            console.error("Menü WebSocket hatası:", error);
+            menuContainer.innerHTML = '<p class="text-center text-red-500">Menü yüklenirken bir hata oluştu. Lütfen sayfayı yenileyin.</p>';
+            loadingMenuMessage.classList.remove('active');
+        };
+
+        menuSocket.onclose = () => {
+            console.log("Menü WebSocket bağlantısı kapandı.");
+            // İsteğe bağlı: Yeniden bağlanma denemesi eklenebilir
+            // loadingMenuMessage.classList.add('active');
+            // setTimeout(connectMenuWebSocket, 5000); // 5 saniye sonra tekrar dene
+        };
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // Başlangıçta boş bir menü göster veya yükleniyor mesajı
+        renderMenu(); 
+        connectMenuWebSocket();
+    });
 </script>
 </body>
 </html>
